@@ -4,8 +4,10 @@
 #include "Graphs/UStoryGraph.h"
 
 #include "GraphEditor.h"
+#include "GraphEditorActions.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Framework/Docking/TabManager.h"
+#include "Nodes/URootGraphNode.h"
 
 static const FName StoryGraphTabName(TEXT("StoryGraph"));
 
@@ -18,7 +20,7 @@ void FStoryAssetEditor::InitStoryAssetEditor(
 	EditedAsset = Asset;
 
 	const TSharedRef<FTabManager::FLayout> Layout =
-		FTabManager::NewLayout("StoryAssetEditor_Layout_v1")
+		FTabManager::NewLayout("StoryAssetEditor")
 		->AddArea
 		(
 			FTabManager::NewPrimaryArea()
@@ -66,8 +68,17 @@ void FStoryAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManager>& InT
 
 TSharedRef<SDockTab> FStoryAssetEditor::SpawnGraphTab(const FSpawnTabArgs&)
 {
+	GraphCommands = MakeShared<FUICommandList>();
+
+	GraphCommands->MapAction(
+		FGraphEditorCommands::Get().DeleteAndReconnectNodes,
+		FExecuteAction::CreateSP(this, &FStoryAssetEditor::DeleteSelectedNodes),
+		FCanExecuteAction::CreateSP(this, &FStoryAssetEditor::CanDeleteNodes)
+	);
+	
 	GraphEditor = SNew(SGraphEditor)
 		.GraphToEdit(EditedAsset->Graph)
+		.AdditionalCommands(GraphCommands)
 		.IsEditable(true);
 
 	return SNew(SDockTab)
@@ -75,6 +86,48 @@ TSharedRef<SDockTab> FStoryAssetEditor::SpawnGraphTab(const FSpawnTabArgs&)
 		[
 			GraphEditor.ToSharedRef()
 		];
+}
+
+bool FStoryAssetEditor::CanDeleteNodes() const
+{
+	if (!GraphEditor.IsValid())
+	{
+		return false;
+	}
+	
+	const FGraphPanelSelectionSet SelectedNodes = GraphEditor->GetSelectedNodes();
+
+	if (SelectedNodes.Num() == 0)
+	{
+		return false;
+	}
+	
+	for (UObject* Node : SelectedNodes)
+	{
+		if (Cast<URootGraphNode>(Node))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void FStoryAssetEditor::DeleteSelectedNodes() const
+{
+	const FGraphPanelSelectionSet SelectedNodes = GraphEditor->GetSelectedNodes();
+
+	GraphEditor->ClearSelectionSet();
+
+	for (UObject* Obj : SelectedNodes)
+	{
+		if (UEdGraphNode* Node = Cast<UEdGraphNode>(Obj))
+		{
+			Node->GetGraph()->RemoveNode(Node);
+		}
+	}
+
+	GraphEditor->NotifyGraphChanged();
 }
 
 FName FStoryAssetEditor::GetToolkitFName() const

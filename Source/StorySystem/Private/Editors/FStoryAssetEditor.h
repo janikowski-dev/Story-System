@@ -28,11 +28,15 @@ public:
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
+	
+	bool CanDeleteNodes() const;
+	void DeleteSelectedNodes() const;
 
 private:
 	TSharedRef<SDockTab> SpawnGraphTab(const FSpawnTabArgs& Args);
 
 private:
+	TSharedPtr<FUICommandList> GraphCommands;
 	TSharedPtr<SGraphEditor> GraphEditor;
 	UStoryAsset* EditedAsset = nullptr;
 };

@@ -34,6 +34,9 @@ UObject* UStoryAssetFactory::FactoryCreateNew(
 	);
 
 	Asset->Graph->Schema = UStoryGraphSchema::StaticClass();
+	Asset->Graph->GetSchema()->CreateDefaultNodesForGraph(*Asset->Graph);
+	Asset->Graph->Modify();
+	Asset->Modify();
 
 	return Asset;
 }
