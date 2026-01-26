@@ -70,6 +70,8 @@ TSharedRef<SDockTab> FStoryAssetEditor::SpawnGraphTab(const FSpawnTabArgs&)
 	GraphEditor = SNew(SGraphEditor)
 		.GraphToEdit(EditedAsset->Graph)
 		.IsEditable(true);
+	
+	EditedAsset->Graph->Editor = GraphEditor;
 
 	return SNew(SDockTab)
 		.Label(FText::FromString("Story Graph"))

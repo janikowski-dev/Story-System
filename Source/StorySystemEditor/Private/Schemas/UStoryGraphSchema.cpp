@@ -7,6 +7,7 @@
 #include "Nodes/UDialogueGraphNode.h"
 #include "ToolMenus.h"
 #include "ToolMenuSection.h"
+#include "Actions/FGraphSchemaAction_FocusRoot.h"
 
 #pragma region Initialization
 
@@ -47,10 +48,7 @@ const FPinConnectionResponse UStoryGraphSchema::CanCreateConnection(
 	const UEdGraphPin* B
 ) const
 {
-	return FPinConnectionResponse(
-		CONNECT_RESPONSE_MAKE,
-		TEXT("")
-	);
+	return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, TEXT(""));
 }
 
 bool UStoryGraphSchema::TryCreateConnection(
@@ -66,7 +64,16 @@ bool UStoryGraphSchema::TryCreateConnection(
 
 #pragma endregion
 
-#pragma region Nodes Creation
+#pragma region Additional Actions
+
+void UStoryGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
+{
+	ContextMenuBuilder.AddAction(MakeShared<FGraphSchemaAction_FocusRoot>());
+}
+
+#pragma endregion
+
+#pragma region Node Creation
 
 void UStoryGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
 {

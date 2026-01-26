@@ -26,12 +26,12 @@ public:
 	void AutoLayout() const;
 	
 	FStoryLayoutNode* BuildLayoutTree(
-		UStoryGraphNode* Root,
+		UStoryGraphNode* Node,
 		TMap<UStoryGraphNode*, FStoryLayoutNode*>& OutMap
 	) const;
 	
 	float LayoutSubtree(
-		FStoryLayoutNode* LayoutNode,
+		FStoryLayoutNode* Node,
 		float& CursorY,
 		float VerticalSpacing
 	) const;
@@ -41,4 +41,7 @@ public:
 		int32 Depth,
 		float CellWidth
 	) const;
+
+public:
+	TSharedPtr<SGraphEditor> Editor;
 };

@@ -13,123 +13,89 @@ void UStoryGraph::AutoLayout() const
 {
 	constexpr float CellWidth  = 350.0f;
 	constexpr float CellHeight = 300.0f;
-
-	UStoryGraphNode* Root = GetRootNode();
-	
-	if (!Root)
-	{
-		return;
-	}
+	float CursorY = 0.0f;
 
 	TMap<UStoryGraphNode*, FStoryLayoutNode*> LayoutMap;
-	FStoryLayoutNode* RootLayout = BuildLayoutTree(Root, LayoutMap);
+	FStoryLayoutNode* Layout = BuildLayoutTree(GetRootNode(), LayoutMap);
+	LayoutSubtree(Layout, CursorY, CellHeight);
+	ApplyLayout(Layout, 0, CellWidth);
+}
 
-	float CursorY = 0.0f;
-	LayoutSubtree(RootLayout, CursorY, CellHeight);
-	ApplyLayout(RootLayout, 0, CellWidth);
-
-	for (const auto& Pair : LayoutMap)
+UStoryGraphNode* UStoryGraph::GetRootNode() const
+{
+	for (UEdGraphNode* Node : Nodes)
 	{
-		delete Pair.Value;
+		if (auto* Root = Cast<URootGraphNode>(Node))
+		{
+			return Root;
+		}
 	}
+	
+	return nullptr;
 }
 
 FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
-	UStoryGraphNode* Root,
+	UStoryGraphNode* Node,
 	TMap<UStoryGraphNode*, FStoryLayoutNode*>& OutMap
 ) const
 {
-	auto GetOrCreate = [&](UStoryGraphNode* Node)
+	FStoryLayoutNode*& Layout = OutMap.FindOrAdd(Node);
+	
+	if (Layout)
 	{
-		if (!OutMap.Contains(Node))
+		return Layout;
+	}
+	
+	Layout = new FStoryLayoutNode{ Node };
+
+	for (UEdGraphPin* Pin : Node->Pins)
+	{
+		if (Pin->Direction != EGPD_Output)
 		{
-			OutMap.Add(Node, new FStoryLayoutNode{Node});
+			continue;
 		}
-		
-		return OutMap[Node];
-	};
 
-	TQueue<UStoryGraphNode*> Queue;
-	Queue.Enqueue(Root);
-	GetOrCreate(Root);
-
-	while (!Queue.IsEmpty())
-	{
-		UStoryGraphNode* Current;
-		Queue.Dequeue(Current);
-
-		FStoryLayoutNode* ParentLayout = GetOrCreate(Current);
-
-		for (UEdGraphPin* Pin : Current->Pins)
+		for (const UEdGraphPin* Linked : Pin->LinkedTo)
 		{
-			if (Pin->Direction != EGPD_Output)
+			UStoryGraphNode* Child = Cast<UStoryGraphNode>(Linked->GetOwningNode());
+			
+			if (!Child)
 			{
 				continue;
 			}
-
-			for (const UEdGraphPin* Linked : Pin->LinkedTo)
-			{
-				auto* Child = Cast<UStoryGraphNode>(Linked->GetOwningNode());
-				
-				if (!Child)
-				{
-					continue;
-				}
-
-				FStoryLayoutNode* ChildLayout = GetOrCreate(Child);
-
-				if (!ParentLayout->Children.Contains(ChildLayout))
-				{
-					ParentLayout->Children.Add(ChildLayout);
-				}
-
-				Queue.Enqueue(Child);
-			}
+			
+			Layout->Children.Add(BuildLayoutTree(Child, OutMap));
 		}
 	}
 
-	return OutMap[Root];
+	return Layout;
 }
 
 float UStoryGraph::LayoutSubtree(
-	FStoryLayoutNode* LayoutNode,
+	FStoryLayoutNode* Node,
 	float& CursorY,
 	const float VerticalSpacing
 ) const
 {
-	if (LayoutNode->bLaidOut)
+	if (Node->Children.IsEmpty())
 	{
-		return LayoutNode->Y;
-	}
-
-	LayoutNode->bLaidOut = true;
-
-	if (LayoutNode->Children.Num() == 0)
-	{
-		LayoutNode->Y = CursorY;
+		Node->Y = CursorY;
 		CursorY += VerticalSpacing;
-		return LayoutNode->Y;
+		return Node->Y;
 	}
 
-	float FirstY = 0.f;
-	float LastY  = 0.f;
-	bool bFirst  = true;
+	float MinY = TNumericLimits<float>::Max();
+	float MaxY = TNumericLimits<float>::Lowest();
 
-	for (FStoryLayoutNode* Child : LayoutNode->Children)
+	for (FStoryLayoutNode* Child : Node->Children)
 	{
 		const float ChildY = LayoutSubtree(Child, CursorY, VerticalSpacing);
-
-		if (bFirst)
-		{
-			FirstY = ChildY;
-			bFirst = false;
-		}
-
-		LastY = ChildY;
+		MinY = FMath::Min(MinY, ChildY);
+		MaxY = FMath::Max(MaxY, ChildY);
 	}
 
-	LayoutNode->Y = (FirstY + LastY) * 0.5f;
-	return LayoutNode->Y;
+	Node->Y = (MinY + MaxY) * 0.5f;
+	return Node->Y;
 }
 
 void UStoryGraph::ApplyLayout(
@@ -150,17 +116,4 @@ void UStoryGraph::ApplyLayout(
 	{
 		ApplyLayout(Child, Depth + 1, CellWidth);
 	}
-}
-
-UStoryGraphNode* UStoryGraph::GetRootNode() const
-{
-	for (UEdGraphNode* Node : Nodes)
-	{
-		if (auto* Root = Cast<URootGraphNode>(Node))
-		{
-			return Root;
-		}
-	}
-	
-	return nullptr;
 }

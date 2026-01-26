@@ -23,6 +23,10 @@ public:
 		UEdGraph* InGraphObj)
 	const override;
 
+	virtual void GetGraphContextActions(
+		FGraphContextMenuBuilder& ContextMenuBuilder
+	) const override;
+
 	virtual void GetContextMenuActions(
 		UToolMenu* Menu,
 		UGraphNodeContextMenuContext* Context
