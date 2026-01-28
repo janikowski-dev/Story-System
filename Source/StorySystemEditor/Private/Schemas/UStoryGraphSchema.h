@@ -4,8 +4,6 @@
 #include "EdGraph/EdGraphSchema.h"
 #include "UStoryGraphSchema.generated.h"
 
-class UStoryGraphNode;
-
 UCLASS()
 class STORYSYSTEMEDITOR_API UStoryGraphSchema : public UEdGraphSchema
 {

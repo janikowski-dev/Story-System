@@ -4,30 +4,28 @@
 #include "EdGraph/EdGraph.h"
 #include "UStoryGraph.generated.h"
 
-class UStoryGraphNode;
-
 struct FStoryLayoutNode
 {
-	UStoryGraphNode* Node = nullptr;
+	UEdGraphNode* Node = nullptr;
 	TArray<FStoryLayoutNode*> Children;
 	float Y = 0.f;
-	bool bLaidOut = false;
 };
 
 UCLASS()
 class STORYSYSTEMEDITOR_API UStoryGraph : public UEdGraph
 {
 	GENERATED_BODY()
+
 public:
 	virtual void PostLoad() override;
 	
-	UStoryGraphNode* GetRootNode() const;
+	UEdGraphNode* GetRootNode() const;
 	
 	void AutoLayout() const;
 	
 	FStoryLayoutNode* BuildLayoutTree(
-		UStoryGraphNode* Node,
-		TMap<UStoryGraphNode*, FStoryLayoutNode*>& OutMap
+		UEdGraphNode* Node,
+		TMap<UEdGraphNode*, FStoryLayoutNode*>& OutMap
 	) const;
 	
 	float LayoutSubtree(

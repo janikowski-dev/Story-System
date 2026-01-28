@@ -1,23 +1,23 @@
 ﻿#include "UStoryGraphSchema.h"
 
-#include "Policies/StoryConnectionDrawingPolicy.h"
-#include "Actions/FGraphSchemaAction_AddNode.h"
-#include "Nodes/UResponseGraphNode.h"
-#include "Nodes/URootGraphNode.h"
-#include "Nodes/UDialogueGraphNode.h"
+#include "Policies/FStoryGraphConnectionDrawingPolicy.h"
+#include "Actions/FStoryGraph_AddNode.h"
+#include "Nodes/Unreal/UStoryResponseNode.h"
+#include "Nodes/Unreal/URootStoryNode.h"
+#include "Nodes/Unreal/UStoryDialogueNode.h"
 #include "ToolMenus.h"
 #include "ToolMenuSection.h"
-#include "Actions/FGraphSchemaAction_FocusRoot.h"
+#include "Actions/FStoryGraph_FocusRoot.h"
 
 #pragma region Initialization
 
 void UStoryGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 {
-	MakeShared<FGraphSchemaAction_AddNode>(
+	MakeShared<FStoryGraph_AddNode>(
 		FText::FromString("Root"),
 		FText::FromString("Root Node"),
 		FText::FromString("Adds a root node"),
-		URootGraphNode::StaticClass()
+		URootStoryNode::StaticClass()
 	)->PerformAction(&Graph,nullptr, FVector2f::Zero(), true);
 }
 
@@ -34,7 +34,7 @@ FConnectionDrawingPolicy* UStoryGraphSchema::CreateConnectionDrawingPolicy(
 	UEdGraph* InGraphObj
 ) const
 {
-	return new FStoryConnectionDrawingPolicy(
+	return new FStoryGraphConnectionDrawingPolicy(
 		InBackLayerID,
 		InFrontLayerID,
 		InZoomFactor,
@@ -68,7 +68,7 @@ bool UStoryGraphSchema::TryCreateConnection(
 
 void UStoryGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
 {
-	ContextMenuBuilder.AddAction(MakeShared<FGraphSchemaAction_FocusRoot>());
+	ContextMenuBuilder.AddAction(MakeShared<FStoryGraph_FocusRoot>());
 }
 
 #pragma endregion
@@ -91,14 +91,14 @@ void UStoryGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContext
 
 void UStoryGraphSchema::AddDialogueContext(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
 {
-	const UDialogueGraphNode* Node = Cast<UDialogueGraphNode>(Context->Node);
+	const UStoryDialogueNode* Node = Cast<UStoryDialogueNode>(Context->Node);
 	
 	if (!Node)
 	{
 		return;
 	}
 	
-	if (HasChildOfType(Node, UResponseGraphNode::StaticClass()))
+	if (HasChildOfType(Node, UStoryResponseNode::StaticClass()))
 	{
 		AddResponseAction(Context, Section);
 	}
@@ -111,7 +111,7 @@ void UStoryGraphSchema::AddDialogueContext(const UGraphNodeContextMenuContext* C
 
 void UStoryGraphSchema::AddResponseContext(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
 {
-	const UResponseGraphNode* Node = Cast<UResponseGraphNode>(Context->Node);
+	const UStoryResponseNode* Node = Cast<UStoryResponseNode>(Context->Node);
 	
 	if (!Node)
 	{
@@ -128,7 +128,7 @@ void UStoryGraphSchema::AddResponseContext(const UGraphNodeContextMenuContext* C
 
 void UStoryGraphSchema::AddRootContext(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
 {
-	const URootGraphNode* Node = Cast<URootGraphNode>(Context->Node);
+	const URootStoryNode* Node = Cast<URootStoryNode>(Context->Node);
 	
 	if (!Node)
 	{
@@ -156,11 +156,11 @@ void UStoryGraphSchema::AddDialogueAction(const UGraphNodeContextMenuContext* Co
 		FUIAction(
 			FExecuteAction::CreateLambda([Graph, Pin]
 			{
-				MakeShared<FGraphSchemaAction_AddNode>(
+				MakeShared<FStoryGraph_AddNode>(
 					FText::FromString("Dialogue"),
 					FText::FromString("Dialogue Node"),
 					FText::FromString("Adds a dialogue node"),
-					UDialogueGraphNode::StaticClass()
+					UStoryDialogueNode::StaticClass()
 				)->PerformAction(Graph, Pin, FVector2f::Zero(), true);
 			})
 		)
@@ -180,11 +180,11 @@ void UStoryGraphSchema::AddResponseAction(const UGraphNodeContextMenuContext* Co
 		FUIAction(
 			FExecuteAction::CreateLambda([Graph, Pin]
 			{
-				MakeShared<FGraphSchemaAction_AddNode>(
+				MakeShared<FStoryGraph_AddNode>(
 					FText::FromString("Response"),
 					FText::FromString("Response Node"),
 					FText::FromString("Adds a response node"),
-					UResponseGraphNode::StaticClass()
+					UStoryResponseNode::StaticClass()
 				)->PerformAction(Graph, Pin, FVector2f::Zero(), true);
 			})
 		)

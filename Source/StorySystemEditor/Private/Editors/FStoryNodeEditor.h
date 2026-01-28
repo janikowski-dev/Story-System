@@ -4,15 +4,15 @@
 #include "Toolkits/AssetEditorToolkit.h"
 #include "Toolkits/IToolkitHost.h"
 
-class UStoryAsset;
+class UStoryNode;
 
-class STORYSYSTEMEDITOR_API FStoryAssetEditor : public FAssetEditorToolkit
+class STORYSYSTEMEDITOR_API FStoryNodeEditor : public FAssetEditorToolkit
 {
 public:
-	void InitStoryAssetEditor(
+	void InitNodeAssetEditor(
 		const EToolkitMode::Type Mode,
 		const TSharedPtr<IToolkitHost>& InitToolkitHost,
-		UStoryAsset* Asset
+		UStoryNode* Node
 	);
 	
 	virtual void RegisterTabSpawners(
@@ -33,5 +33,5 @@ private:
 
 private:
 	TSharedPtr<SGraphEditor> GraphEditor;
-	UStoryAsset* EditedAsset = nullptr;
+	UStoryNode* EditedNode = nullptr;
 };

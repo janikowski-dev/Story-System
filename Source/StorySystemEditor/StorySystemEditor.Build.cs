@@ -23,7 +23,8 @@ public class StorySystemEditor : ModuleRules
 			"SlateCore",
 			"GraphEditor",
 			"ToolMenus",
-			"InputCore"
+			"InputCore",
+			"WorkspaceMenuStructure"
 		]);
 	}
 }

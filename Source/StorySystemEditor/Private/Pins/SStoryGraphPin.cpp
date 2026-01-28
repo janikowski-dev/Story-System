@@ -1,4 +1,5 @@
 ﻿#include "SStoryGraphPin.h"
+
 #include "SGraphPin.h"
 
 void SStoryGraphPin::Construct(const FArguments&, UEdGraphPin* InPin)

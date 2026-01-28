@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Graphs/UStoryGraph.h"
+#include "Nodes/Unreal/UStoryNode.h"
 #include "UStoryAsset.generated.h"
-
-class UStoryGraph;
 
 UCLASS()
 class STORYSYSTEMEDITOR_API UStoryAsset : public UDataAsset
@@ -14,4 +14,6 @@ class STORYSYSTEMEDITOR_API UStoryAsset : public UDataAsset
 public:
 	UPROPERTY()
 	TObjectPtr<UStoryGraph> Graph;
+	UPROPERTY()
+	TMap<TObjectPtr<UStoryNode>, TObjectPtr<UEdGraph>> InnerGraphsByNode;
 };

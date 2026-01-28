@@ -1,7 +1,6 @@
 ﻿#include "UStoryGraph.h"
 
-#include "Nodes/URootGraphNode.h"
-#include "Nodes/UStoryGraphNode.h"
+#include "Nodes/Unreal/URootStoryNode.h"
 
 void UStoryGraph::PostLoad()
 {
@@ -15,17 +14,17 @@ void UStoryGraph::AutoLayout() const
 	constexpr float CellHeight = 300.0f;
 	float CursorY = 0.0f;
 
-	TMap<UStoryGraphNode*, FStoryLayoutNode*> LayoutMap;
+	TMap<UEdGraphNode*, FStoryLayoutNode*> LayoutMap;
 	FStoryLayoutNode* Layout = BuildLayoutTree(GetRootNode(), LayoutMap);
 	LayoutSubtree(Layout, CursorY, CellHeight);
 	ApplyLayout(Layout, 0, CellWidth);
 }
 
-UStoryGraphNode* UStoryGraph::GetRootNode() const
+UEdGraphNode* UStoryGraph::GetRootNode() const
 {
 	for (UEdGraphNode* Node : Nodes)
 	{
-		if (auto* Root = Cast<URootGraphNode>(Node))
+		if (auto* Root = Cast<URootStoryNode>(Node))
 		{
 			return Root;
 		}
@@ -35,8 +34,8 @@ UStoryGraphNode* UStoryGraph::GetRootNode() const
 }
 
 FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
-	UStoryGraphNode* Node,
-	TMap<UStoryGraphNode*, FStoryLayoutNode*>& OutMap
+	UEdGraphNode* Node,
+	TMap<UEdGraphNode*, FStoryLayoutNode*>& OutMap
 ) const
 {
 	FStoryLayoutNode*& Layout = OutMap.FindOrAdd(Node);
@@ -57,7 +56,7 @@ FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
 
 		for (const UEdGraphPin* Linked : Pin->LinkedTo)
 		{
-			UStoryGraphNode* Child = Cast<UStoryGraphNode>(Linked->GetOwningNode());
+			UEdGraphNode* Child = Cast<UEdGraphNode>(Linked->GetOwningNode());
 			
 			if (!Child)
 			{
