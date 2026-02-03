@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "SGraphNode.h"
-#include "Nodes/Unreal/UStoryNode.h"
 
 enum ENodeViewType : int32
 {
@@ -9,6 +8,8 @@ enum ENodeViewType : int32
 	Collapsed = 1,
 	Hidden = 2
 };
+
+class UStoryNode;
 
 class SStoryNode : public SGraphNode
 {
@@ -27,17 +28,21 @@ protected:
 
 private:
 	void AddHeader(const TSharedRef<SVerticalBox>& Box);
+	void ApplyCollapse() const;
+	void RefreshGraph() const;
 	void ApplyCollapse(
-		UEdGraphNode* CurrentNode,
-		UEdGraphNode* RootNode,
-		TSet<UEdGraphNode*>& Visited
+		UStoryNode* CurrentNode,
+		bool bParentHidden,
+		TSet<UStoryNode*>& Visited
 	) const;
-	FReply ToggleCollapse();
+	void ToggleCollapsedState() const;
+	FReply ToggleCollapse() const;
 	void OpenNodeEditor() const;
 	int GetBodyIndex() const;
 	
 public:
+	TWeakObjectPtr<UStoryNode> TypedNode;
+
+private:
 	TSharedPtr<SWidgetSwitcher> WidgetSwitcher;
-	bool bIsCollapsed = false;
-	bool bIsHidden = false;
 };

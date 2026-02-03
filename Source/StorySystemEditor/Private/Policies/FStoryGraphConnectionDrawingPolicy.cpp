@@ -1,5 +1,7 @@
 ﻿#include "FStoryGraphConnectionDrawingPolicy.h"
 
+#include "Nodes/Unreal/UStoryNode.h"
+
 FStoryGraphConnectionDrawingPolicy::FStoryGraphConnectionDrawingPolicy(
 	const int32 InBackLayerID,
 	const int32 InFrontLayerID,
@@ -23,6 +25,11 @@ void FStoryGraphConnectionDrawingPolicy::DrawSplineWithArrow(
 	const FConnectionParams& Params
 )
 {
+	if (!IsTargetNodeEnabled(Params))
+	{
+		return;
+	}
+	
 	const FVector2f PinOffset = GetPinOffset();
 	
 	if (IsStraightConnection(StartPoint, EndPoint))
@@ -164,4 +171,11 @@ bool FStoryGraphConnectionDrawingPolicy::IsStraightConnection(
 ) const
 {
 	return StartPoint.Y == EndPoint.Y;
+}
+
+bool FStoryGraphConnectionDrawingPolicy::IsTargetNodeEnabled(const FConnectionParams& Params) const
+{
+	UEdGraphNode* Node = Params.AssociatedPin2->GetOwningNode();
+	const UStoryNode* TypedNode = Cast<UStoryNode>(Node);
+	return !TypedNode->bIsHidden;
 }

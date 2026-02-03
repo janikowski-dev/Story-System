@@ -132,7 +132,7 @@ void SStoryNode::AddHeader(const TSharedRef<SVerticalBox>& Box)
 				SNew(SImage)
 				.Image_Lambda([this]()
 				{
-					return bIsCollapsed
+					return TypedNode->bIsCollapsed
 						? FAppStyle::Get().GetBrush("Icons.ChevronRight")
 						: FAppStyle::Get().GetBrush("Icons.ChevronDown");
 				})
@@ -141,19 +141,24 @@ void SStoryNode::AddHeader(const TSharedRef<SVerticalBox>& Box)
 	];
 }
 
-FReply SStoryNode::ToggleCollapse()
+FReply SStoryNode::ToggleCollapse() const
 {
-	bIsCollapsed = !bIsCollapsed;
-	TSet<UEdGraphNode*> Visited;
-	ApplyCollapse(GraphNode, GraphNode, Visited);
-	Cast<UStoryGraph>(GraphNode->GetGraph())->AutoLayout();
+	ToggleCollapsedState();
+	ApplyCollapse();
+	RefreshGraph();
 	return FReply::Handled();
 }
 
+void SStoryNode::ApplyCollapse() const
+{
+	TSet<UStoryNode*> Visited;
+	ApplyCollapse(TypedNode.Get(), false, Visited);
+}
+
 void SStoryNode::ApplyCollapse(
-	UEdGraphNode* CurrentNode,
-	UEdGraphNode* RootNode,
-	TSet<UEdGraphNode*>& Visited
+	UStoryNode* CurrentNode,
+	const bool bParentHidden,
+	TSet<UStoryNode*>& Visited
 ) const
 {
 	if (!CurrentNode || Visited.Contains(CurrentNode))
@@ -162,20 +167,8 @@ void SStoryNode::ApplyCollapse(
 	}
 
 	Visited.Add(CurrentNode);
-
-	TSharedPtr<SGraphPanel> GraphPanel = GetOwnerPanel();
-	if (!GraphPanel.IsValid())
-	{
-		return;
-	}
-
-	if (CurrentNode != RootNode)
-	{
-		if (TSharedPtr<SGraphNode> Widget = GraphPanel->GetNodeWidgetFromGuid(CurrentNode->NodeGuid))
-		{
-			StaticCastSharedPtr<SStoryNode>(Widget)->bIsHidden = bIsCollapsed;
-		}
-	}
+	CurrentNode->bIsHidden = bParentHidden;
+	const bool bHideChildren = bParentHidden || CurrentNode->bIsCollapsed;
 
 	for (UEdGraphPin* Pin : CurrentNode->Pins)
 	{
@@ -184,14 +177,25 @@ void SStoryNode::ApplyCollapse(
 			continue;
 		}
 
-		for (UEdGraphPin* LinkedPin : Pin->LinkedTo)
+		for (const UEdGraphPin* LinkedPin : Pin->LinkedTo)
 		{
-			if (UEdGraphNode* ChildNode = LinkedPin->GetOwningNode())
+			if (UStoryNode* ChildNode = Cast<UStoryNode>(LinkedPin->GetOwningNode()))
 			{
-				ApplyCollapse(ChildNode, RootNode, Visited);
+				ApplyCollapse(ChildNode, bHideChildren, Visited);
 			}
 		}
 	}
+}
+
+void SStoryNode::ToggleCollapsedState() const
+{
+	TypedNode->bIsCollapsed = !TypedNode->bIsCollapsed;
+}
+
+void SStoryNode::RefreshGraph() const
+{
+	const UStoryGraph* TypedGraph = Cast<UStoryGraph>(GraphNode->GetGraph());
+	TypedGraph->AutoLayout();
 }
 
 void SStoryNode::OpenNodeEditor() const
@@ -210,12 +214,12 @@ void SStoryNode::OpenNodeEditor() const
 
 int SStoryNode::GetBodyIndex() const
 {
-	if (bIsCollapsed)
+	if (TypedNode->bIsCollapsed)
 	{
 		return Collapsed;
 	}
 
-	if (bIsHidden)
+	if (TypedNode->bIsHidden)
 	{
 		return Hidden;
 	}
@@ -225,5 +229,6 @@ int SStoryNode::GetBodyIndex() const
 
 void SStoryNode::Cache(UEdGraphNode* Node)
 {
+	TypedNode = Cast<UStoryNode>(Node);
 	GraphNode = Node;
 }

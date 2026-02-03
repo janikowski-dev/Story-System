@@ -1,43 +1,12 @@
 ﻿#include "UStoryGraph.h"
 
-#include "SGraphPanel.h"
-#include "Nodes/Slate/SStoryNode.h"
 #include "Nodes/Unreal/UStoryRootNode.h"
 
 struct FStoryLayoutNode
 {
-	UEdGraphNode* Node = nullptr;
+	UStoryNode* Node = nullptr;
 	TArray<FStoryLayoutNode*> Children;
 	float Y = 0.0f;
-
-	bool IsHidden(const TSharedPtr<SGraphEditor>& Editor) const
-	{
-		if (!Editor)
-		{
-			return false;
-		}
-		
-		const SGraphPanel* GraphPanel = Editor->GetGraphPanel();
-
-		if (!GraphPanel)
-		{
-			return false;
-		}
-		
-		if (const TSharedPtr<SGraphNode> Widget = GraphPanel->GetNodeWidgetFromGuid(Node->NodeGuid))
-		{
-			const TSharedPtr<SStoryNode> StoryNode = StaticCastSharedPtr<SStoryNode>(Widget);
-			
-			if (!StoryNode)
-			{
-				return false;
-			}
-			
-			return StoryNode->bIsHidden;
-		}
-
-		return false;
-	}
 };
 
 void UStoryGraph::PostLoad()
@@ -52,17 +21,22 @@ void UStoryGraph::AutoLayout() const
 	constexpr float CellHeight = 300.0f;
 	float CursorY = 0.0f;
 
-	TMap<UEdGraphNode*, FStoryLayoutNode*> LayoutMap;
+	TMap<UStoryNode*, FStoryLayoutNode*> LayoutMap;
 	FStoryLayoutNode* Layout = BuildLayoutTree(GetRootNode(), LayoutMap);
 	LayoutSubtree(Layout, CursorY, CellHeight);
 	ApplyLayout(Layout, 0, CellWidth);
+	
+	for (const TPair<UStoryNode*, FStoryLayoutNode*>& Iterator : LayoutMap)
+	{
+		delete Iterator.Value;
+	}
 }
 
-UEdGraphNode* UStoryGraph::GetRootNode() const
+UStoryNode* UStoryGraph::GetRootNode() const
 {
 	for (UEdGraphNode* Node : Nodes)
 	{
-		if (auto* Root = Cast<UStoryRootNode>(Node))
+		if (UStoryRootNode* Root = Cast<UStoryRootNode>(Node))
 		{
 			return Root;
 		}
@@ -72,8 +46,8 @@ UEdGraphNode* UStoryGraph::GetRootNode() const
 }
 
 FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
-	UEdGraphNode* Node,
-	TMap<UEdGraphNode*, FStoryLayoutNode*>& OutMap
+	UStoryNode* Node,
+	TMap<UStoryNode*, FStoryLayoutNode*>& OutMap
 ) const
 {
 	FStoryLayoutNode*& Layout = OutMap.FindOrAdd(Node);
@@ -94,7 +68,7 @@ FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
 
 		for (const UEdGraphPin* Linked : Pin->LinkedTo)
 		{
-			UEdGraphNode* Child = Cast<UEdGraphNode>(Linked->GetOwningNode());
+			UStoryNode* Child = Cast<UStoryNode>(Linked->GetOwningNode());
 			
 			if (!Child)
 			{
@@ -141,14 +115,14 @@ void UStoryGraph::ApplyLayout(
 	const float CellWidth
 ) const
 {
-	constexpr float InvisibleAndOutOfSightNodeX = -1000.0f;
+	constexpr float InvisibleAndOutOfSightNodeX = -100000.0f;
 	
 	if (!LayoutNode || !LayoutNode->Node)
 	{
 		return;
 	}
 
-	if (LayoutNode->IsHidden(Editor))
+	if (LayoutNode->Node->bIsHidden)
 	{
 		LayoutNode->Node->NodePosX = InvisibleAndOutOfSightNodeX;
 	}

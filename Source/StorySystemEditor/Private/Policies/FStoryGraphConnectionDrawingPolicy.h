@@ -26,6 +26,7 @@ protected:
 		const FConnectionParams& Params
 	) override;
 
+private:
 	void DrawStraightConnection(
 		const FVector2f& StartPoint,
 		const FVector2f& EndPoint,
@@ -58,4 +59,6 @@ protected:
 		const FVector2f& StartPoint,
 		const FVector2f& EndPoint
 	) const;
+
+	bool IsTargetNodeEnabled(const FConnectionParams& Params) const;
 };

@@ -5,6 +5,7 @@
 #include "UStoryGraph.generated.h"
 
 struct FStoryLayoutNode;
+class UStoryNode;
 
 UCLASS()
 class STORYSYSTEMEDITOR_API UStoryGraph : public UEdGraph
@@ -13,13 +14,13 @@ class STORYSYSTEMEDITOR_API UStoryGraph : public UEdGraph
 
 public:
 	virtual void PostLoad() override;
-	UEdGraphNode* GetRootNode() const;
+	UStoryNode* GetRootNode() const;
 	void AutoLayout() const;
 	
 private:
 	FStoryLayoutNode* BuildLayoutTree(
-		UEdGraphNode* Node,
-		TMap<UEdGraphNode*, FStoryLayoutNode*>& OutMap
+		UStoryNode* Node,
+		TMap<UStoryNode*, FStoryLayoutNode*>& OutMap
 	) const;
 	
 	float LayoutSubtree(
