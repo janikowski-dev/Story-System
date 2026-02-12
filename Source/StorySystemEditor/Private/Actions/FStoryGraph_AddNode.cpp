@@ -12,7 +12,7 @@ UEdGraphNode* FStoryGraph_AddNode::PerformAction(
 	const FScopedTransaction Transaction(NSLOCTEXT("StoryGraph", "AddNode", "Add Node"));
 	UEdGraphNode* NewNode = CreateNewNode(ParentGraph);
 	TryAttachingPin(ParentGraph, NewNode, FromPin);
-	Cast<UStoryGraph>(ParentGraph)->AutoLayout();
+	Cast<UStoryGraph>(ParentGraph)->Refresh();
 	return NewNode;
 }
 

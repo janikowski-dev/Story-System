@@ -4,9 +4,10 @@
 #include "Actions/FStoryGraph_AddNode.h"
 #include "Nodes/Unreal/UStoryResponseNode.h"
 #include "Nodes/Unreal/UStoryRootNode.h"
-#include "Nodes/Unreal/UStoryDialogueNode.h"
+#include "Nodes/Unreal/UStoryLineNode.h"
 #include "ToolMenus.h"
 #include "ToolMenuSection.h"
+#include "Actions/FStoryGraph_DeleteNodeWithChildren.h"
 #include "Actions/FStoryGraph_FocusRoot.h"
 
 #pragma region Initialization
@@ -14,11 +15,8 @@
 void UStoryGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 {
 	MakeShared<FStoryGraph_AddNode>(
-		FText::FromString("Root"),
-		FText::FromString("Root Node"),
-		FText::FromString("Adds a root node"),
 		UStoryRootNode::StaticClass()
-	)->PerformAction(&Graph,nullptr, FVector2f::Zero(), true);
+	)->PerformAction(&Graph,nullptr, FVector2f::Zero());
 }
 
 #pragma endregion
@@ -84,14 +82,15 @@ void UStoryGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContext
 		return;
 	}
 
-	AddDialogueContext(Context, Section);
+	AddLineContext(Context, Section);
 	AddResponseContext(Context, Section);
 	AddRootContext(Context, Section);
+	AddDeleteAction(Context, Section);
 }
 
-void UStoryGraphSchema::AddDialogueContext(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
+void UStoryGraphSchema::AddLineContext(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
 {
-	const UStoryDialogueNode* Node = Cast<UStoryDialogueNode>(Context->Node);
+	const UStoryLineNode* Node = Cast<UStoryLineNode>(Context->Node);
 	
 	if (!Node)
 	{
@@ -104,7 +103,7 @@ void UStoryGraphSchema::AddDialogueContext(const UGraphNodeContextMenuContext* C
 	}
 	else if (!HasAnyChild(Node))
 	{
-		AddDialogueAction(Context, Section);
+		AddLineAction(Context, Section);
 		AddResponseAction(Context, Section);
 	}
 }
@@ -123,7 +122,7 @@ void UStoryGraphSchema::AddResponseContext(const UGraphNodeContextMenuContext* C
 		return;
 	}
 	
-	AddDialogueAction(Context, Section);
+	AddLineAction(Context, Section);
 }
 
 void UStoryGraphSchema::AddRootContext(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
@@ -140,27 +139,27 @@ void UStoryGraphSchema::AddRootContext(const UGraphNodeContextMenuContext* Conte
 		return;
 	}
 	
-	AddDialogueAction(Context, Section);
+	AddLineAction(Context, Section);
 }
 
-void UStoryGraphSchema::AddDialogueAction(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
+void UStoryGraphSchema::AddLineAction(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
 {
 	UEdGraph* Graph = const_cast<UEdGraph*>(Context->Graph.Get());
 	UEdGraphPin* Pin = GetOutputPin(Context->Node);
 	
 	Section->AddMenuEntry(
-		"AddDialogueNode",
-		FText::FromString("Dialogue Node"),
+		"AddLineNode",
+		FText::FromString("Line Node"),
 		FText::FromString("Adds a dialogue node"),
 		FSlateIcon(),
 		FUIAction(
 			FExecuteAction::CreateLambda([Graph, Pin]
 			{
 				MakeShared<FStoryGraph_AddNode>(
-					FText::FromString("Dialogue"),
-					FText::FromString("Dialogue Node"),
+					FText::FromString("Line"),
+					FText::FromString("Line Node"),
 					FText::FromString("Adds a dialogue node"),
-					UStoryDialogueNode::StaticClass()
+					UStoryLineNode::StaticClass()
 				)->PerformAction(Graph, Pin, FVector2f::Zero(), true);
 			})
 		)
@@ -186,6 +185,25 @@ void UStoryGraphSchema::AddResponseAction(const UGraphNodeContextMenuContext* Co
 					FText::FromString("Adds a response node"),
 					UStoryResponseNode::StaticClass()
 				)->PerformAction(Graph, Pin, FVector2f::Zero(), true);
+			})
+		)
+	);
+}
+
+void UStoryGraphSchema::AddDeleteAction(const UGraphNodeContextMenuContext* Context, FToolMenuSection* Section) const
+{
+	UEdGraph* Graph = const_cast<UEdGraph*>(Context->Graph.Get());
+	UEdGraphPin* Pin = GetOutputPin(Context->Node);
+	
+	Section->AddMenuEntry(
+		"DeleteNode",
+		FText::FromString("Delete Node"),
+		FText::FromString("Deletes node and its' children"),
+		FSlateIcon(),
+		FUIAction(
+			FExecuteAction::CreateLambda([Graph, Pin]
+			{
+				MakeShared<FStoryGraph_DeleteNodeWithChildren>()->PerformAction(Graph, Pin, FVector2f::Zero(), true);
 			})
 		)
 	);

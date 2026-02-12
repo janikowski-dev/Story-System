@@ -2,15 +2,15 @@
 
 #include "SStoryTextNode.h"
 
-class UStoryDialogueNode;
+class UStoryLineNode;
 
-class SStoryDialogueNode : public SStoryTextNode
+class SStoryLineNode : public SStoryTextNode
 {
 public:
-	SLATE_BEGIN_ARGS(SStoryDialogueNode) {}
+	SLATE_BEGIN_ARGS(SStoryLineNode) {}
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments&, UStoryDialogueNode* InNode);
+	void Construct(const FArguments&, UStoryLineNode* InNode);
 	
 protected:
 	virtual void AddBody(const TSharedRef<SVerticalBox>& Box) override;

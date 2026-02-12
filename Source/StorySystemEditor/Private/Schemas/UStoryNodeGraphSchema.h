@@ -20,9 +20,4 @@ public:
 		const UEdGraphPin* A,
 		const UEdGraphPin* B
 	) const override;
-
-	virtual bool TryCreateConnection(
-		UEdGraphPin* A,
-		UEdGraphPin* B
-	) const override;
 };

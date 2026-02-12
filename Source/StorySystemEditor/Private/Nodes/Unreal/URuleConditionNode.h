@@ -11,4 +11,5 @@ class STORYSYSTEMEDITOR_API URuleConditionNode : public URuleNode
 public:
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type) const override;
+	virtual FLinearColor GetNodeTitleColor() const override;
 };

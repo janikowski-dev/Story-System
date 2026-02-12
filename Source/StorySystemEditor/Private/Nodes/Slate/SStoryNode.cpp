@@ -1,6 +1,5 @@
 ﻿#include "SStoryNode.h"
 
-#include "Editors/FStoryNodeEditor.h"
 #include "Nodes/Unreal/UStoryNode.h"
 #include "Pins/SStoryGraphPin.h"
 #include "Widgets/Layout/SWidgetSwitcher.h"
@@ -19,12 +18,6 @@ TSharedPtr<SGraphPin> SStoryNode::CreatePinWidget(UEdGraphPin* Pin) const
 TSharedPtr<SGraphPin> SStoryNode::GetHoveredPin(const FGeometry&, const FPointerEvent&) const
 {
 	return nullptr;
-}
-
-FReply SStoryNode::OnMouseButtonDoubleClick(const FGeometry&, const FPointerEvent&)
-{
-	OpenNodeEditor();
-	return FReply::Handled();
 }
 
 void SStoryNode::UpdateGraphNode()
@@ -195,21 +188,7 @@ void SStoryNode::ToggleCollapsedState() const
 void SStoryNode::RefreshGraph() const
 {
 	const UStoryGraph* TypedGraph = Cast<UStoryGraph>(GraphNode->GetGraph());
-	TypedGraph->AutoLayout();
-}
-
-void SStoryNode::OpenNodeEditor() const
-{
-	if (UStoryNode* NodeAsset = Cast<UStoryNode>(GraphNode))
-	{
-		const TSharedRef<FStoryNodeEditor> Editor = MakeShared<FStoryNodeEditor>();
-
-		Editor->InitNodeAssetEditor(
-			EToolkitMode::Standalone,
-			TSharedPtr<IToolkitHost>(),
-			NodeAsset
-		);
-	}
+	TypedGraph->Refresh();
 }
 
 int SStoryNode::GetBodyIndex() const

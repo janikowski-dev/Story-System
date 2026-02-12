@@ -13,8 +13,6 @@ public:
 
 public:
 	UPROPERTY()
-	int32 EditorIndex;
-	UPROPERTY()
 	bool bIsCollapsed = false;
 	UPROPERTY()
 	bool bIsHidden = false;

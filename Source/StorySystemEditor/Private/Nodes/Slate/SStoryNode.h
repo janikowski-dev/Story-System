@@ -17,7 +17,6 @@ public:
 	virtual void MoveTo(const FVector2f& NewPosition, FNodeSet& NodeFilter, bool bMarkDirty = true) override;
 	virtual TSharedPtr<SGraphPin> CreatePinWidget(UEdGraphPin* Pin) const override;
 	virtual TSharedPtr<SGraphPin> GetHoveredPin(const FGeometry&, const FPointerEvent&) const override;
-	virtual FReply OnMouseButtonDoubleClick(const FGeometry&, const FPointerEvent&) override;
 	virtual void UpdateGraphNode() override;
 
 protected:
@@ -37,7 +36,6 @@ private:
 	) const;
 	void ToggleCollapsedState() const;
 	FReply ToggleCollapse() const;
-	void OpenNodeEditor() const;
 	int GetBodyIndex() const;
 	
 public:

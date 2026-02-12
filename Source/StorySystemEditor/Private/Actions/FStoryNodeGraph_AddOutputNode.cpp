@@ -1,7 +1,9 @@
-﻿#include "FStoryNodeGraph_AddNode.h"
-#include "EdGraph/EdGraph.h"
+﻿#include "FStoryNodeGraph_AddOutputNode.h"
 
-UEdGraphNode* FStoryNodeGraph_AddNode::PerformAction(
+#include "EdGraph/EdGraph.h"
+#include "Nodes/Unreal/URuleOutputNode.h"
+
+UEdGraphNode* FStoryNodeGraph_AddOutputNode::PerformAction(
 	UEdGraph* ParentGraph,
 	UEdGraphPin*,
 	const FVector2f& Location,
@@ -12,24 +14,25 @@ UEdGraphNode* FStoryNodeGraph_AddNode::PerformAction(
 	return CreateNewNode(ParentGraph, Location);
 }
 
-UEdGraphNode* FStoryNodeGraph_AddNode::CreateNewNode(UEdGraph* ParentGraph, const FVector2f& Location) const
+UEdGraphNode* FStoryNodeGraph_AddOutputNode::CreateNewNode(UEdGraph* ParentGraph, const FVector2f& Location) const
 {
 	ParentGraph->Modify();
 
-	UEdGraphNode* NewNode = NewObject<UEdGraphNode>(
+	URuleOutputNode* NewNode = NewObject<URuleOutputNode>(
 		ParentGraph,
 		NodeClass,
 		NAME_None,
 		RF_Transactional
 	);
-	
+
 	NewNode->NodePosX = Location.X;
 	NewNode->NodePosY = Location.Y;
+	NewNode->Type = OutputType;
 	
 	NewNode->CreateNewGuid();
 	NewNode->PostPlacedNewNode();
 	NewNode->AllocateDefaultPins();
-
+	
 	ParentGraph->AddNode(NewNode, true, true);
 	
 	return NewNode;

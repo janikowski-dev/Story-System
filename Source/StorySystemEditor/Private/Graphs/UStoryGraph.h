@@ -15,12 +15,15 @@ class STORYSYSTEMEDITOR_API UStoryGraph : public UEdGraph
 public:
 	virtual void PostLoad() override;
 	UStoryNode* GetRootNode() const;
-	void AutoLayout() const;
+	void Refresh() const;
 	
 private:
+	void ApplyLayout() const;
+	void ApplyLineIndexes() const;
+	
 	FStoryLayoutNode* BuildLayoutTree(
 		UStoryNode* Node,
-		TMap<UStoryNode*, FStoryLayoutNode*>& OutMap
+		TMap<UStoryNode*, FStoryLayoutNode*>& LayoutMap
 	) const;
 	
 	float LayoutSubtree(
@@ -34,6 +37,14 @@ private:
 		int32 Depth,
 		float CellWidth
 	) const;
+
+	void ApplyLineIndexes(
+		UStoryNode* Node,
+		int32& NodeIndex,
+		TSet<UStoryNode*>& Visited
+	) const;
+
+	void ApplyResponseIndexes() const;
 
 public:
 	TSharedPtr<SGraphEditor> Editor;

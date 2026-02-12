@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "UStoryNode.h"
-#include "UStoryDialogueNode.generated.h"
+#include "UStoryLineNode.generated.h"
 
 UCLASS()
-class STORYSYSTEMEDITOR_API UStoryDialogueNode : public UStoryNode
+class STORYSYSTEMEDITOR_API UStoryLineNode : public UStoryNode
 {
 	GENERATED_BODY()
 
@@ -15,4 +15,6 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	FText Text;
+	UPROPERTY()
+	int32 LineIndex;
 };

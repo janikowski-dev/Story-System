@@ -14,7 +14,7 @@ void SStoryRootNode::AddBody(const TSharedRef<SVerticalBox>& Box)
 
 FText SStoryRootNode::GetTitle(UStoryNode* Node)
 {
-	return FText::FromString("Root_0");
+	return FText::FromString("ROOT");
 }
 
 FSlateColor SStoryRootNode::GetHeaderColor() const

@@ -15,4 +15,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	FText Text;
+	UPROPERTY()
+	int32 ParentIndex;
+	UPROPERTY()
+	int32 OrderIndex;
 };

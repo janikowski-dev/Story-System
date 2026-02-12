@@ -41,12 +41,17 @@ public:
 	) const override;
 	
 private:
-	void AddDialogueAction(
+	void AddLineAction(
 		const UGraphNodeContextMenuContext* Context,
 		FToolMenuSection* Section
 	) const;
 
 	void AddResponseAction(
+		const UGraphNodeContextMenuContext* Context,
+		FToolMenuSection* Section
+	) const;
+
+	void AddDeleteAction(
 		const UGraphNodeContextMenuContext* Context,
 		FToolMenuSection* Section
 	) const;
@@ -60,7 +65,7 @@ private:
 		const UEdGraphNode* Node
 	) const;
 
-	void AddDialogueContext(
+	void AddLineContext(
 		const UGraphNodeContextMenuContext* Context,
 		FToolMenuSection* Section
 	) const;

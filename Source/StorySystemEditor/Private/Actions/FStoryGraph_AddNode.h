@@ -4,7 +4,11 @@ struct FStoryGraph_AddNode : FEdGraphSchemaAction
 {
 	TSubclassOf<UEdGraphNode> NodeClass;
 
-	FStoryGraph_AddNode(
+	explicit FStoryGraph_AddNode(const TSubclassOf<UEdGraphNode> InNodeClass) : NodeClass(InNodeClass)
+	{
+	}
+
+	explicit FStoryGraph_AddNode(
 		const FText& InCategory,
 		const FText& InMenuDesc,
 		const FText& InTooltip,

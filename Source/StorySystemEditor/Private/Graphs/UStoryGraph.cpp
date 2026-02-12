@@ -1,5 +1,7 @@
 ﻿#include "UStoryGraph.h"
 
+#include "Nodes/Unreal/UStoryLineNode.h"
+#include "Nodes/Unreal/UStoryResponseNode.h"
 #include "Nodes/Unreal/UStoryRootNode.h"
 
 struct FStoryLayoutNode
@@ -12,10 +14,17 @@ struct FStoryLayoutNode
 void UStoryGraph::PostLoad()
 {
 	Super::PostLoad();
-	AutoLayout();
+	Refresh();
 }
 
-void UStoryGraph::AutoLayout() const
+void UStoryGraph::Refresh() const
+{
+	ApplyLayout();
+	ApplyLineIndexes();
+	ApplyResponseIndexes();
+}
+
+void UStoryGraph::ApplyLayout() const
 {
 	constexpr float CellWidth  = 350.0f;
 	constexpr float CellHeight = 300.0f;
@@ -30,6 +39,13 @@ void UStoryGraph::AutoLayout() const
 	{
 		delete Iterator.Value;
 	}
+}
+
+void UStoryGraph::ApplyLineIndexes() const
+{
+	int32 NodeIndex = 0;
+	TSet<UStoryNode*> Visited;
+	ApplyLineIndexes(GetRootNode(), NodeIndex, Visited);
 }
 
 UStoryNode* UStoryGraph::GetRootNode() const
@@ -47,10 +63,10 @@ UStoryNode* UStoryGraph::GetRootNode() const
 
 FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
 	UStoryNode* Node,
-	TMap<UStoryNode*, FStoryLayoutNode*>& OutMap
+	TMap<UStoryNode*, FStoryLayoutNode*>& LayoutMap
 ) const
 {
-	FStoryLayoutNode*& Layout = OutMap.FindOrAdd(Node);
+	FStoryLayoutNode*& Layout = LayoutMap.FindOrAdd(Node);
 	
 	if (Layout)
 	{
@@ -75,7 +91,7 @@ FStoryLayoutNode* UStoryGraph::BuildLayoutTree(
 				continue;
 			}
 			
-			Layout->Children.Add(BuildLayoutTree(Child, OutMap));
+			Layout->Children.Add(BuildLayoutTree(Child, LayoutMap));
 		}
 	}
 
@@ -136,5 +152,72 @@ void UStoryGraph::ApplyLayout(
 	for (FStoryLayoutNode* Child : LayoutNode->Children)
 	{
 		ApplyLayout(Child, Depth + 1, CellWidth);
+	}
+}
+
+void UStoryGraph::ApplyLineIndexes(
+	UStoryNode* Node,
+	int32& NodeIndex,
+	TSet<UStoryNode*>& Visited
+) const
+{
+	if (!Node || Visited.Contains(Node))
+	{
+		return;
+	}
+
+	Visited.Add(Node);
+
+	if (UStoryLineNode* Line = Cast<UStoryLineNode>(Node))
+	{
+		Line->LineIndex = ++NodeIndex;
+	}
+
+	for (UEdGraphPin* Pin : Node->Pins)
+	{
+		if (Pin->Direction != EGPD_Output)
+		{
+			continue;
+		}
+
+		for (const UEdGraphPin* Linked : Pin->LinkedTo)
+		{
+			if (UStoryNode* Child = Cast<UStoryNode>(Linked->GetOwningNode()))
+			{
+				ApplyLineIndexes(Child, NodeIndex, Visited);
+			}
+		}
+	}
+}
+
+void UStoryGraph::ApplyResponseIndexes() const
+{
+	for (UEdGraphNode* GraphNode : Nodes)
+	{
+		UStoryLineNode* Line = Cast<UStoryLineNode>(GraphNode);
+		
+		if (!Line)
+		{
+			continue;
+		}
+
+		int32 ChildIndex = 0;
+
+		for (UEdGraphPin* Pin : Line->Pins)
+		{
+			if (Pin->Direction != EGPD_Output)
+			{
+				continue;
+			}
+
+			for (const UEdGraphPin* Linked : Pin->LinkedTo)
+			{
+				if (UStoryResponseNode* Response = Cast<UStoryResponseNode>(Linked->GetOwningNode()))
+				{
+					Response->ParentIndex = Line->LineIndex;
+					Response->OrderIndex = ++ChildIndex;
+				}
+			}
+		}
 	}
 }

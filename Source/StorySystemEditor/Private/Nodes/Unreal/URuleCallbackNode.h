@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "URuleNode.h"
-#include "URuleOrNode.generated.h"
+#include "URuleCallbackNode.generated.h"
 
 UCLASS()
-class STORYSYSTEMEDITOR_API URuleOrNode : public URuleNode
+class STORYSYSTEMEDITOR_API URuleCallbackNode : public URuleNode
 {
 	GENERATED_BODY()
 	

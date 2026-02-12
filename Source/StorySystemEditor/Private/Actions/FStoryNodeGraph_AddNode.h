@@ -4,7 +4,11 @@ struct FStoryNodeGraph_AddNode : FEdGraphSchemaAction
 {
 	TSubclassOf<UEdGraphNode> NodeClass;
 
-	FStoryNodeGraph_AddNode(
+	explicit FStoryNodeGraph_AddNode(const TSubclassOf<UEdGraphNode> InNodeClass) : NodeClass(InNodeClass)
+	{
+	}
+	
+	explicit FStoryNodeGraph_AddNode(
 		const FText& InCategory,
 		const FText& InMenuDesc,
 		const FText& InTooltip,
@@ -21,5 +25,5 @@ struct FStoryNodeGraph_AddNode : FEdGraphSchemaAction
 		bool bSelectNewNode = true
 	) override;
 	
-	UEdGraphNode* CreateNewNode(UEdGraph* ParentGraph) const;
+	UEdGraphNode* CreateNewNode(UEdGraph* ParentGraph, const FVector2f& Location) const;
 };

@@ -7,4 +7,7 @@ UCLASS()
 class STORYSYSTEMEDITOR_API URuleNode : public UEdGraphNode
 {
 	GENERATED_BODY()
+
+public:
+	virtual bool AllowMultipleInputs() const;
 };
