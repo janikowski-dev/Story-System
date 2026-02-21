@@ -8,21 +8,26 @@ The system is designed to give game developers full control over storytelling me
 
 ### Current Features
 
--   **Branching Dialogue Paths**  
+-   **Branching Dialogue Paths**
+
     ![Example Dialogue](Assets/Example_Dialogue.png)
 
--   **Node Collapsing**  
+-   **Node Collapsing**
+
     ![Node Collapsing](Assets/Node_Collapsing.png)
     
 -   **Node Inner Graph**
     
-    -   Requirements for node availability  
+    -   Requirements for node availability
+  
         ![Requirements](Assets/Requirements.png)
         
     -   Callbacks after node
+ 
         ![Callbacks](Assets/Callbacks.png)
 
--   **Inner State Visualization: Key - Requirements & Link - Callbacks**  
+-   **Inner State Visualization: Key - Requirements & Link - Callbacks**
+
     ![Requirements And Callbacks Visuals](Assets/Requirements_And_Callbacks.png)
 
 ### Planned Features
