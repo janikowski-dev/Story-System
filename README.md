@@ -9,34 +9,45 @@ The system is designed to give game developers full control over storytelling me
 ### Current Features
 
 -   **Branching Dialogue Paths**  
-    ![Branching Dialogue](Assets/Branching.png)
+    ![Example Dialogue](Assets/Example_Dialogue.png)
+
+-   **Node Collapsing**  
+    ![Node Collapsing](Assets/Node_Collapsing.png)
     
--   **Response Node Inner Graph**
+-   **Node Inner Graph**
     
-    -   Requirements for response availability  
-        ![Response Requirements](Assets/Response_Requirements.png)
+    -   Requirements for node availability  
+        ![Requirements](Assets/Requirements.png)
         
-    -   Callbacks **before** response  
-        ![Pre Response Callback](Assets/Pre_Response_Callback.png)
-        
-    -   Callbacks **after** response  
-        ![Post Response Callback](Assets/Post_Response_Callback.png)
-        
--   **Visuals of Response Node inner graph in main graph**  
-    ![Outer Visuals](Assets/Outer_Visuals.png)
+    -   Callbacks after node
+        ![Callbacks](Assets/Callbacks.png)
+
+-   **Inner State Visualization (Key - Requirements | Link - Callbacks)**  
+    ![Requirements And Callbacks Visuals](Assets/Requirements_And_Callbacks.png)
 
 ### Planned Features
 
--   Rules based on user-defined assets instead of enums
--   Character lines separation
--   Link Nodes (to connect existing Line Nodes)
+-   Separating dialogue lines per character
+
+# Rule System (WIP)
+
+### Current Features
+
+- Asset-based rules creation `RMB/Miscellaneous/Data Asset/Rule Asset`
+- GUID-oriented rule recognition
+- Rule database fetching conditions from `Rules/Conditions` and callbacks from `Rules/Callbacks`
+
+### Planned Features
+
+- Browser for rules
+- Validator for assets
+- Parametrized rules (?)
 
 ## Roadmap
 
-1.  Rule System
-2.  Character Database
-3.  Cinematic Timeline
-4.  Quest Editor
+1.  Character Database
+2.  Cinematic Timeline
+3.  Quest Editor
 
 ## Getting Started
 
