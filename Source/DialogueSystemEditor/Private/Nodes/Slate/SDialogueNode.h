@@ -1,10 +1,12 @@
 ﻿#pragma once
 
 #include "SGraphNode.h"
-#include "Nodes/Unreal/UDialogueLineNode.h"
-#include "Nodes/Unreal/UDialogueLinkNode.h"
-#include "Nodes/Unreal/UDialogueResponseNode.h"
-#include "Nodes/Unreal/UDialogueRootNode.h"
+
+class UDialogueNode;
+class UDialogueResponseNode;
+class UDialogueLineNode;
+class UDialogueLinkNode;
+class UDialogueRootNode;
 
 enum ENodeViewType : int32
 {
@@ -12,8 +14,6 @@ enum ENodeViewType : int32
 	Collapsed = 1,
 	Hidden = 2
 };
-
-class UDialogueNode;
 
 template<typename TNodeType>
 class SDialogueNode : public SGraphNode

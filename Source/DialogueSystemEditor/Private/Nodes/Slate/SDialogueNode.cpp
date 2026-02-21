@@ -1,6 +1,11 @@
 ﻿#include "SDialogueNode.h"
 
 #include "Nodes/Unreal/UDialogueNode.h"
+#include "Nodes/Unreal/UDialogueLineNode.h"
+#include "Nodes/Unreal/UDialogueLinkNode.h"
+#include "Nodes/Unreal/UDialogueResponseNode.h"
+#include "Nodes/Unreal/UDialogueRootNode.h"
+
 #include "Pins/SDialogueGraphPin.h"
 #include "Widgets/Layout/SWidgetSwitcher.h"
 #include "SGraphPanel.h"
@@ -223,3 +228,8 @@ void SDialogueNode<TNodeType>::Cache(UEdGraphNode* Node)
 	TypedNode = Cast<TNodeType>(Node);
 	GraphNode = Node;
 }
+
+template class SDialogueNode<UDialogueResponseNode>;
+template class SDialogueNode<UDialogueLineNode>;
+template class SDialogueNode<UDialogueLinkNode>;
+template class SDialogueNode<UDialogueRootNode>;
