@@ -1,10 +1,19 @@
 ﻿#include "FChronicleCharacterDirectory.h"
 
+#include "FChronicle_CombinedCharacterSet.h"
 #include "UChronicleCharacterSettings.h"
 
-FCharacterSet FChronicleCharacterDirectory::PlayableCharacterSet;
-FCharacterSet FChronicleCharacterDirectory::AllCharacterSet;
+FChronicle_CombinedCharacterSet FChronicleCharacterDirectory::AllCharacterSet(
+	PlayableCharacterSet,
+	NonPlayableCharacterSet
+);
 FCharacterSet FChronicleCharacterDirectory::NonPlayableCharacterSet;
+FCharacterSet FChronicleCharacterDirectory::PlayableCharacterSet;
+
+FChronicle_CombinedCharacterSet& FChronicleCharacterDirectory::GetAll()
+{
+	return AllCharacterSet;
+}
 
 FCharacterSet& FChronicleCharacterDirectory::GetPlayable()
 {
@@ -16,16 +25,9 @@ FCharacterSet& FChronicleCharacterDirectory::GetNonPlayable()
 	return NonPlayableCharacterSet;
 }
 
-FCharacterSet& FChronicleCharacterDirectory::GetAll()
-{
-	return AllCharacterSet;
-}
-
 void FChronicleCharacterDirectory::Refresh()
 {
 	const UChronicleCharacterSettings* const Settings = GetDefault<UChronicleCharacterSettings>();
 	NonPlayableCharacterSet.Refresh(Settings->NonPlayableCharacters);
 	PlayableCharacterSet.Refresh(Settings->PlayableCharacters);
-	AllCharacterSet.Refresh(Settings->NonPlayableCharacters);
-	AllCharacterSet.Refresh(Settings->PlayableCharacters);
 }

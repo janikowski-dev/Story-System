@@ -17,12 +17,14 @@ void FRuleSet::Refresh(const TArray<FRule>& Rules)
 		
 		if (bContainsId)
 		{
-			continue;
+			NamesById[Rule.Id] = Rule.Name;
 		}
-		
-		TSharedPtr<FGuid> SharedId = MakeShared<FGuid>(Rule.Id);
-		NamesById.Add(Rule.Id, Rule.Name);
-		Ids.Add(SharedId);
+		else
+		{
+			TSharedPtr<FGuid> SharedId = MakeShared<FGuid>(Rule.Id);
+			NamesById.Add(Rule.Id, Rule.Name);
+			Ids.Add(SharedId);
+		}
 	}
 }
 

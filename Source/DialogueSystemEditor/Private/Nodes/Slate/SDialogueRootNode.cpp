@@ -26,6 +26,8 @@ void SDialogueRootNode::AddCurrentParticipantList(const TSharedRef<SVerticalBox>
 {
 	for (TSharedPtr ParticipantId : TypedGraph->SharedParticipantIds)
 	{
+		const bool bIsPlayer = FChronicleCharacterDirectory::GetPlayable().IsValid(*ParticipantId);
+		
 		Box->AddSlot()
 		.AutoHeight()
 		.Padding(4.0f, 2.0f)
@@ -38,7 +40,9 @@ void SDialogueRootNode::AddCurrentParticipantList(const TSharedRef<SVerticalBox>
 			.VAlign(VAlign_Center)
 			[
 				SNew(SImage)
-				.Image(FDialogueGraphEditorStyle::Get().GetBrush("Icons.Participant"))
+				.Image(FDialogueGraphEditorStyle::Get().GetBrush(
+					bIsPlayer ? "Icons.Player" : "Icons.Other")
+				)
 				.DesiredSizeOverride(FVector2D(16.0f, 16.0f))
 			]
 
@@ -114,6 +118,11 @@ void SDialogueRootNode::AddNewParticipantButton(const TSharedRef<SVerticalBox>& 
 FReply SDialogueRootNode::OpenAddParticipantWindow() const
 {
 	const TSharedRef<SVerticalBox> MissingParticipants = SNew(SVerticalBox);
+	
+	const bool bHasPlayer = TypedGraph->SharedParticipantIds.ContainsByPredicate([](const TSharedPtr<FGuid>& Id)
+	{
+		return FChronicleCharacterDirectory::GetPlayable().IsValid(*Id);
+	});
     
     for (const TSharedPtr<FGuid>& CharacterId : FChronicleCharacterDirectory::GetAll().GetSharedIds())
     {
@@ -121,6 +130,13 @@ FReply SDialogueRootNode::OpenAddParticipantWindow() const
         {
             continue;
         }
+
+    	const bool bIsPlayer = FChronicleCharacterDirectory::GetPlayable().IsValid(*CharacterId);
+
+    	if (bHasPlayer && bIsPlayer)
+    	{
+    		continue;
+    	}
     
         const FName CharacterName = FChronicleCharacterDirectory::GetAll().GetName(*CharacterId);
     

@@ -7,7 +7,7 @@
 void SRuleInputNode::Construct(const FArguments&,
 	URuleInputNode* InNode,
 	const FRuleSet& InRuleSet,
-	const FCharacterSet& InCharacterSet
+	const IChronicle_CharacterSet& InCharacterSet
 )
 {
 	Cache(InNode);
@@ -181,12 +181,12 @@ void SRuleInputNode::Cache(URuleInputNode* InNode)
 
 void SRuleInputNode::Cache(const FRuleSet& InSet)
 {
-	RuleSet = const_cast<FRuleSet*>(&InSet);
 	RuleIds = InSet.GetSharedIds();
+	RuleSet = &InSet;
 }
 
-void SRuleInputNode::Cache(const FCharacterSet& InSet)
+void SRuleInputNode::Cache(const IChronicle_CharacterSet& InSet)
 {
-	CharacterSet = const_cast<FCharacterSet*>(&InSet);
 	CharacterIds = InSet.GetSharedIds();
+	CharacterSet = &InSet;
 }

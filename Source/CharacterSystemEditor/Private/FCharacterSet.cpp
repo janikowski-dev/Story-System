@@ -13,12 +13,14 @@ void FCharacterSet::Refresh(const TArray<FChronicleCharacter>& Characters)
 		
 		if (bContainsId)
 		{
-			continue;
+			NamesById[Character.Id] = Character.Name;
 		}
-		
-		TSharedPtr<FGuid> SharedId = MakeShared<FGuid>(Character.Id);
-		NamesById.Add(Character.Id, Character.Name);
-		Ids.Add(SharedId);
+		else
+		{
+			TSharedPtr<FGuid> SharedId = MakeShared<FGuid>(Character.Id);
+			NamesById.Add(Character.Id, Character.Name);
+			Ids.Add(SharedId);
+		}
 	}
 }
 

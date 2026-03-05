@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "FCharacterSet.h"
 #include "FRuleSet.h"
 #include "SDialogueNode.h"
+#include "IChronicle_CharacterSet.h"
 
 class URuleInputNode;
 
@@ -15,7 +15,7 @@ public:
 	void Construct(const FArguments&,
 		URuleInputNode* InNode,
 		const FRuleSet& InRuleSet,
-		const FCharacterSet& InCharacterSet
+		const IChronicle_CharacterSet& InCharacterSet
 	);
 	
 	virtual void UpdateGraphNode() override;
@@ -28,14 +28,14 @@ private:
 	
 	void Cache(URuleInputNode* InNode);
 	void Cache(const FRuleSet& InSet);
-	void Cache(const FCharacterSet& InSet);
+	void Cache(const IChronicle_CharacterSet& InSet);
 	
 private:
 	TWeakObjectPtr<URuleInputNode> TypedNode;
 	
-	TArray<TSharedPtr<FGuid>> CharacterIds;
-	FCharacterSet* CharacterSet = nullptr;
+	const IChronicle_CharacterSet* CharacterSet = nullptr;
+	const FRuleSet* RuleSet = nullptr;
 	
+	TArray<TSharedPtr<FGuid>> CharacterIds;
 	TArray<TSharedPtr<FGuid>> RuleIds;
-	FRuleSet* RuleSet = nullptr;
 };

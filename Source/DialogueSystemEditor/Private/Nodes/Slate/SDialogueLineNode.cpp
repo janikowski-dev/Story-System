@@ -132,10 +132,21 @@ void SDialogueLineNode::FixAssignedIds() const
 		TypedNode->SpeakerId = FGuid();
 	}
 
-	if (!bContainsListener && !bContainsSpeaker && TypedGraph->SharedParticipantIds.Num() > 1)
+	for (const TSharedPtr<FGuid>& Id : TypedGraph->SharedParticipantIds)
 	{
-		TypedNode->ListenerId = *TypedGraph->SharedParticipantIds[0];
-		TypedNode->SpeakerId = *TypedGraph->SharedParticipantIds[1];
+		if (!Id)
+		{
+			continue;
+		}
+
+		if (!TypedNode->ListenerId.IsValid() && *Id != TypedNode->SpeakerId)
+		{
+			TypedNode->ListenerId = *Id;
+		}
+		else if (!TypedNode->SpeakerId.IsValid() && *Id != TypedNode->ListenerId)
+		{
+			TypedNode->SpeakerId = *Id;
+		}
 	}
 }
 
