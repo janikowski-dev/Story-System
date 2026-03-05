@@ -16,9 +16,7 @@ Chronicle is divided into separate modules for clarity and easier maintenance. E
 
 ### Rule System
 
-![Rule System Overview 1](Assets/Rule_System_Overview_1.png)
-
-![Rule System Overview 2](Assets/Rule_System_Overview_2.png)
+![Rule System Overview](Assets/Rule_System_Overview.png)
 
 [See full Rule System documentation →](Docs/RuleSystem.md)
 
