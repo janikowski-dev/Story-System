@@ -57,7 +57,7 @@ Future planned modules and features for Chronicle:
 Usage and integration instructions are included in each module’s README:
 
 - [Dialogue System](Docs/DialogueSystem.md) – Create and manage branching conversations with visual nodes
-- [Rule System](Docs/RuleSystem.md) – Define game logic and conditions via reusable rule assets
+- [Rule System](Docs/RuleSystem.md) – Define game logic and conditions
 - [Character System](Docs/CharacterSystem.md) – Manage characters
 
 ## Contributing
