@@ -10,7 +10,7 @@
 	"DocsURL": "https://github.com/janikowski-dev/chronicle",
 	"MarketplaceURL": "",
 	"SupportURL": "https://github.com/janikowski-dev/chronicle/issues",
-	"CanContainContent": false,
+	"CanContainContent": true,
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": false,
 	"Installed": false,
@@ -25,15 +25,20 @@
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		},
-        {
-          "Name": "RuleSystemEditor",
-          "Type": "Editor",
-          "LoadingPhase": "Default"
-        },
-        {
-          "Name": "CharacterSystemEditor",
-          "Type": "Editor",
-          "LoadingPhase": "Default"
-        }
+		{
+			"Name": "RuleSystemEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "CharacterSystemEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "CinematicTimelineEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
 	]
 }

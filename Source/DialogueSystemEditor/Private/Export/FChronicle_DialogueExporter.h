@@ -8,15 +8,20 @@ class UChronicle_DialogueNode;
 class UChronicle_RuleNode;
 class UChronicle_DialogueAsset;
 
-class FChronicle_DialogueExporter
+class DIALOGUESYSTEMEDITOR_API FChronicle_DialogueExporter
 {
 public:
-	static void CopyToClipboard(const UChronicle_DialogueAsset* Asset);
-	static void ExportToAsset(const UChronicle_DialogueAsset* Asset);
+	static UChronicle_DialogueData* ConvertToData(const UChronicle_DialogueAsset* Asset);
+	static FString ConvertToJson(const UChronicle_DialogueAsset* Asset);
+	
+	static void ExportJsonToClipboard(const UChronicle_DialogueAsset* Asset);
+	static void ExportToData(const UChronicle_DialogueAsset* Asset);
 
 private:
-	static UChronicle_DialogueData* ConvertToAsset(const UChronicle_DialogueAsset* Asset);
-	static UChronicle_DialogueData* ConvertToTemporaryAsset(const UChronicle_DialogueAsset* Asset);
+	static UChronicle_DialogueData* ConvertToData_Internal(const UChronicle_DialogueAsset* Asset);
+	static FString ConvertToJson_Internal(const UChronicle_DialogueAsset* Asset);
+	
+	static UChronicle_DialogueData* ConvertToTemporaryData(const UChronicle_DialogueAsset* Asset);
 	
 	static void ReadData(const UChronicle_DialogueAsset* Asset, UChronicle_DialogueData* Data);
 	static FChronicle_DialogueNodeData ReadNodeData(UChronicle_DialogueNode* Node);

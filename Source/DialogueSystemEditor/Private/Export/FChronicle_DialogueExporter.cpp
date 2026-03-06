@@ -18,20 +18,29 @@
 #include "UChronicle_DialogueData.h"
 #include "Windows/WindowsPlatformApplicationMisc.h"
 
-void FChronicle_DialogueExporter::CopyToClipboard(const UChronicle_DialogueAsset* Asset)
+UChronicle_DialogueData* FChronicle_DialogueExporter::ConvertToData(const UChronicle_DialogueAsset* Asset)
 {
-    FString JsonString;
-    FJsonObjectConverter::UStructToJsonObjectString(UChronicle_DialogueData::StaticClass(), ConvertToTemporaryAsset(Asset), JsonString);
+    return ConvertToData_Internal(Asset);
+}
+
+FString FChronicle_DialogueExporter::ConvertToJson(const UChronicle_DialogueAsset* Asset)
+{
+    return ConvertToJson_Internal(Asset);
+}
+
+void FChronicle_DialogueExporter::ExportJsonToClipboard(const UChronicle_DialogueAsset* Asset)
+{
+    const FString JsonString = ConvertToJson_Internal(Asset);
     FPlatformApplicationMisc::ClipboardCopy(*JsonString);
     UE_LOG(LogTemp, Log, TEXT("Copied dialogue to clipboard!"));
 }
 
-void FChronicle_DialogueExporter::ExportToAsset(const UChronicle_DialogueAsset* Asset)
+void FChronicle_DialogueExporter::ExportToData(const UChronicle_DialogueAsset* Asset)
 {
-    FAssetRegistryModule::AssetCreated(ConvertToAsset(Asset));
+    FAssetRegistryModule::AssetCreated(ConvertToData_Internal(Asset));
 }
 
-UChronicle_DialogueData* FChronicle_DialogueExporter::ConvertToAsset(const UChronicle_DialogueAsset* Asset)
+UChronicle_DialogueData* FChronicle_DialogueExporter::ConvertToData_Internal(const UChronicle_DialogueAsset* Asset)
 {
     const FString AssetName = FString::Printf(TEXT("%s_Data"), *Asset->GetName());
     UPackage* Package = CreatePackage(*(FPackageName::GetLongPackagePath(Asset->GetOutermost()->GetName()) / AssetName));
@@ -40,7 +49,14 @@ UChronicle_DialogueData* FChronicle_DialogueExporter::ConvertToAsset(const UChro
     return Data;
 }
 
-UChronicle_DialogueData* FChronicle_DialogueExporter::ConvertToTemporaryAsset(const UChronicle_DialogueAsset* Asset)
+FString FChronicle_DialogueExporter::ConvertToJson_Internal(const UChronicle_DialogueAsset* Asset)
+{
+    FString JsonString;
+    FJsonObjectConverter::UStructToJsonObjectString(UChronicle_DialogueData::StaticClass(), ConvertToTemporaryData(Asset), JsonString);
+    return JsonString;
+}
+
+UChronicle_DialogueData* FChronicle_DialogueExporter::ConvertToTemporaryData(const UChronicle_DialogueAsset* Asset)
 {
     UChronicle_DialogueData* Data = NewObject<UChronicle_DialogueData>(GetTransientPackage());
     ReadData(Asset, Data);

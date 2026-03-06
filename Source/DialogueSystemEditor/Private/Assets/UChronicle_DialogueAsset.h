@@ -15,7 +15,8 @@ class DIALOGUESYSTEMEDITOR_API UChronicle_DialogueAsset : public UDataAsset
 
 public:
 	UPROPERTY()
-	TObjectPtr<UChronicle_DialogueGraph> Graph;
-	UPROPERTY()
 	TMap<UChronicle_DialogueNode*, TObjectPtr<UChronicle_RuleGraph>> InnerGraphsByNode;
+	
+	UPROPERTY()
+	TObjectPtr<UChronicle_DialogueGraph> Graph;
 };
