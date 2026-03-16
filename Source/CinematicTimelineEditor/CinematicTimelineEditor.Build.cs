@@ -18,7 +18,8 @@ public class CinematicTimelineEditor : ModuleRules
 			"AssetRegistry",
 			"ToolMenus",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"DeveloperSettings"
 		]);
 	}
 }

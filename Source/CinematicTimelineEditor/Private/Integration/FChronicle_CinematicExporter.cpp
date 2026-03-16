@@ -1,10 +1,11 @@
-﻿#include "FChronicle_CinematicImporter.h"
+﻿#include "FChronicle_CinematicExporter.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "UObject/SavePackage.h"
 
-UChronicle_CinematicData* FChronicle_CinematicImporter::ConvertToCinematicData(const UChronicle_DialogueData* Input)
+UChronicle_CinematicData* FChronicle_CinematicExporter::ExportToCinematicData(const UChronicle_DialogueData* Input)
 {
-    const FString PackagePath = TEXT("/Game/CinematicData/") + Input->GetName() + TEXT("_Cinematic");
+    const FString PackagePath = TEXT("/Game/Cinematics/") + Input->GetName();
     UPackage* Package = CreatePackage(*PackagePath);
 
     UChronicle_CinematicData* Output = NewObject<UChronicle_CinematicData>(Package, 
@@ -14,23 +15,31 @@ UChronicle_CinematicData* FChronicle_CinematicImporter::ConvertToCinematicData(c
     );
 
     TMap<FGuid, const FChronicle_DialogueNodeData*> NodeMap;
+    
     NodeMap.Reserve(Input->Nodes.Num());
+    
     for (const FChronicle_DialogueNodeData& Node : Input->Nodes)
     {
         NodeMap.Add(Node.Id, &Node);
     }
 
     const FChronicle_DialogueNodeData* Root = nullptr;
+    
     for (const FChronicle_DialogueNodeData& Node : Input->Nodes)
     {
-        if (Node.Type == EChronicle_DialogueNodeType::Root)
+        if (Node.Type != EChronicle_DialogueNodeType::Root)
         {
-            Root = &Node;
-            break;
+            continue;
         }
+
+        Root = &Node;
+        break;
     }
 
-    if (!Root) return Output;
+    if (!Root)
+    {
+        return Output;
+    }
 
     struct FTraversalState
     {
@@ -40,7 +49,10 @@ UChronicle_CinematicData* FChronicle_CinematicImporter::ConvertToCinematicData(c
 
     auto FlushSequence = [&](TArray<FChronicle_DialogueNodeData>& Nodes)
     {
-        if (Nodes.Num() == 0) return;
+        if (Nodes.Num() == 0)
+        {
+            return;
+        }
 
         FChronicle_SequenceData NewSequence;
         NewSequence.Nodes = MoveTemp(Nodes);
@@ -48,9 +60,7 @@ UChronicle_CinematicData* FChronicle_CinematicImporter::ConvertToCinematicData(c
         Nodes.Reset();
     };
 
-    auto PushChildren = [&](TArray<FTraversalState>& Stack,
-                            const FChronicle_DialogueNodeData* Node,
-                            TArray<FChronicle_DialogueNodeData> SharedAccumulated)
+    auto PushChildren = [&](TArray<FTraversalState>& Stack, const FChronicle_DialogueNodeData* Node, TArray<FChronicle_DialogueNodeData> SharedAccumulated)
     {
         for (const FGuid& ChildId : Node->Children)
         {
@@ -128,6 +138,23 @@ UChronicle_CinematicData* FChronicle_CinematicImporter::ConvertToCinematicData(c
         }
     }
 
+    Package->MarkPackageDirty();
+
+    FString PackageFilename;
+    FPackageName::TryConvertLongPackageNameToFilename(
+        PackagePath,
+        PackageFilename,
+        FPackageName::GetAssetPackageExtension()
+    );
+
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.Error = GError;
+    SaveArgs.bForceByteSwapping = false;
+    SaveArgs.bWarnOfLongFilename = true;
+
+    UPackage::SavePackage(Package, Output, *PackageFilename, SaveArgs);
+    
     FAssetRegistryModule::AssetCreated(Output);
     return Output;
 }

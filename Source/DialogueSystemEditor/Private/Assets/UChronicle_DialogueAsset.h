@@ -8,7 +8,7 @@
 
 class UChronicle_RuleGraph;
 
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class DIALOGUESYSTEMEDITOR_API UChronicle_DialogueAsset : public UDataAsset
 {
 	GENERATED_BODY()
