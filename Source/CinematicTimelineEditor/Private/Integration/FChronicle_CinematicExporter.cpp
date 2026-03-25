@@ -252,7 +252,7 @@ void FChronicle_CinematicExporter::PopulateOutput(const UChronicle_DialogueData*
 
                 for (const FGuid& ChildId : LineChildren)
                 {
-                    TryPushChild(Stack, ChildId, {}, FlushedId, true);
+                    TryPushChild(Stack, ChildId, {}, FlushedId, false);
                 }
 
                 for (const FGuid& ChildId : OtherChildren)
