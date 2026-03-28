@@ -60,6 +60,7 @@ Planned features for Chronicle in no particular order:
 Usage and integration instructions are included in each module’s README:
 
 - [Dialogue System](Docs/DialogueSystem.md) – Create and manage branching conversations with visual nodes
+- [Cinematic Timeline](Docs/CinematicTimeline.md) – Convert dialogue graphs to in-game cinematic sequences
 - [Rule System](Docs/RuleSystem.md) – Define game logic and conditions
 - [Character System](Docs/CharacterSystem.md) – Manage characters
 
