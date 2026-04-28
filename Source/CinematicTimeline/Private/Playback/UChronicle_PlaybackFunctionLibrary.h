@@ -16,6 +16,15 @@ public:
 		const FRotator& RotationOffset
 	);
 	
+	UFUNCTION(BlueprintCallable, Category="Chronicle|Cinematics")
+	static void OffsetCamera(
+		const ALevelSequenceActor* LevelSequenceActor,
+		const FTransform& OwnerTransform,
+		const FTransform& ResponseTransform,
+		const float VerticalOffset,
+		const float ForwardOffset
+	);
+	
 	UFUNCTION(BlueprintCallable, Category = "Chronicle|Runtime")
 	static void SetPlaybackPosition(
 		ALevelSequenceActor* LevelSequenceActor,

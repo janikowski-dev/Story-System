@@ -10,9 +10,12 @@
 #include "Sections/MovieSceneCameraCutSection.h"
 #include "Tracks/MovieSceneCameraCutTrack.h"
 #include "Tracks/MovieSceneAudioTrack.h"
-#include "Tracks/MovieSceneFloatTrack.h"
 #include "Tracks/MovieSceneSpawnTrack.h"
 #include "UObject/SavePackage.h"
+#include "LevelSequence.h"
+#include "Tracks/MovieScene3DTransformTrack.h"
+#include "Sections/MovieScene3DTransformSection.h"
+#include "Channels/MovieSceneDoubleChannel.h"
 
 FChronicle_SequenceInfo FChronicle_CinematicBlueprintUtilities::InitSequence(
 	ULevelSequence* LevelSequence,
@@ -39,7 +42,8 @@ UBlueprint* FChronicle_CinematicBlueprintUtilities::CreateBlueprintFromParent(
 	UClass* ParentClass,
 	const FString& PackagePath,
 	const FString& BlueprintName,
-	const FChronicle_DialogueInfo& Info
+	const FChronicle_DialogueInfo& Info,
+	const FTransform& ResponseTransform
 )
 {
 	if (!Info.Id.IsValid() || !ParentClass)
@@ -69,13 +73,25 @@ UBlueprint* FChronicle_CinematicBlueprintUtilities::CreateBlueprintFromParent(
 	{
 		if (UObject* CDO = Blueprint->GeneratedClass->GetDefaultObject())
 		{
-			FProperty* Prop = FindFProperty<FProperty>(Blueprint->GeneratedClass, TEXT("Info"));
+			FProperty* InfoProperty = FindFProperty<FProperty>(Blueprint->GeneratedClass, TEXT("Info"));
 
-			if (FStructProperty* StructProp = CastField<FStructProperty>(Prop))
+			if (FStructProperty* StructProperty = CastField<FStructProperty>(InfoProperty))
 			{
-				void* StructPtr = StructProp->ContainerPtrToValuePtr<void>(CDO);
-				StructProp->Struct->CopyScriptStruct(StructPtr, &Info);
-				FPropertyChangedEvent PropertyChangedEvent(StructProp);
+				void* StructPtr = StructProperty->ContainerPtrToValuePtr<void>(CDO);
+				StructProperty->Struct->CopyScriptStruct(StructPtr, &Info);
+				FPropertyChangedEvent PropertyChangedEvent(StructProperty);
+				CDO->PostEditChangeProperty(PropertyChangedEvent);
+				Blueprint->Modify();
+				FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			}
+			
+			FProperty* ResponseTransformProperty = FindFProperty<FProperty>(Blueprint->GeneratedClass, TEXT("ResponseTransform"));
+
+			if (FStructProperty* StructProperty = CastField<FStructProperty>(ResponseTransformProperty))
+			{
+				void* StructPtr = StructProperty->ContainerPtrToValuePtr<void>(CDO);
+				StructProperty->Struct->CopyScriptStruct(StructPtr, &ResponseTransform);
+				FPropertyChangedEvent PropertyChangedEvent(StructProperty);
 				CDO->PostEditChangeProperty(PropertyChangedEvent);
 				Blueprint->Modify();
 				FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
@@ -89,7 +105,7 @@ UBlueprint* FChronicle_CinematicBlueprintUtilities::CreateBlueprintFromParent(
 
 	FKismetEditorUtilities::CompileBlueprint(Blueprint);
 
-	FString PackageFileName = FPackageName::LongPackageNameToFilename(
+	const FString PackageFileName = FPackageName::LongPackageNameToFilename(
 		Package->GetName(),
 		FPackageName::GetAssetPackageExtension()
 	);
@@ -231,7 +247,6 @@ FChronicle_SequenceInfo FChronicle_CinematicBlueprintUtilities::ConvertToRuntime
 	
 	return RuntimeInfo;
 }
-
 FSequenceInfo FChronicle_CinematicBlueprintUtilities::ConvertToInfo(
 	UMovieScene* MovieScene,
 	const UChronicle_CinematicData* CinematicData,
@@ -263,36 +278,35 @@ FSequenceInfo FChronicle_CinematicBlueprintUtilities::ConvertToInfo(
 
 	SequenceInfo.TotalFrameCount = FrameCounter;
 	SequenceInfo.Id = SequenceData.Id;
-	
+
+	const UChronicle_ShotPresetData* Preset = CinematicData->PresetData.LoadSynchronous();
 	const int ParticipantCount = CinematicData->ParticipantIds.Num();
-	
+
 	for (int i = 0; i < ParticipantCount; i++)
 	{
-		constexpr float Radius = 350.0f;
 		const FGuid& ParticipantId = CinematicData->ParticipantIds[i];
 
-		const float Angle = 2.0f * PI * i / ParticipantCount;
-		const FVector Position(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.0f);
+		const FShotPair* MatchingPair = Preset ? Preset->ShotPairs.FindByPredicate([i](const FShotPair& Pair)
+		{
+			return Pair.ShotIndex == i;
+		}) : nullptr;
 
-		const FVector DirectionToCenter = (FVector::ZeroVector - Position).GetSafeNormal();
-		const FRotator LookAtRotation = FRotator(0.0f, DirectionToCenter.Rotation().Yaw - 90.0f, 0.0f);
+		FTransform ParticipantTransform;
+		FTransform CameraTransform;
 
-		SequenceInfo.TransformByParticipantIds.Add(ParticipantId, FTransform(LookAtRotation, Position));
-	}
+		if (MatchingPair)
+		{
+			ParticipantTransform = MatchingPair->ParticipantTransform;
+			CameraTransform = MatchingPair->CameraTransform;
+		}
 
-	for (const FGuid& ParticipantId : CinematicData->ParticipantIds)
-	{
-		const FTransform* ParticipantTransform = SequenceInfo.TransformByParticipantIds.Find(ParticipantId);
-		const FVector ParticipantLocation = ParticipantTransform->GetLocation();
-		const FVector CameraLocation = FVector::ZeroVector;
-		const FRotator CameraRotation = (ParticipantLocation - CameraLocation).Rotation();
-		const FTransform CameraTransform(CameraRotation, CameraLocation);
+		SequenceInfo.TransformByParticipantIds.Add(ParticipantId, ParticipantTransform);
 
 		FGuid CameraId = AddCamera(MovieScene, CameraTransform);
 		SequenceInfo.CameraIdByParticipantIds.Add(ParticipantId, CameraId);
 
 		USkeletalMesh* SkeletalMesh = CinematicData->ActorsById[ParticipantId].LoadSynchronous();
-		FGuid ModelId = AddModel(MovieScene, SkeletalMesh, *ParticipantTransform);
+		FGuid ModelId = AddModel(MovieScene, SkeletalMesh, ParticipantTransform);
 		SequenceInfo.ModelIdByParticipantIds.Add(ParticipantId, ModelId);
 	}
 	
@@ -358,9 +372,7 @@ FGuid FChronicle_CinematicBlueprintUtilities::AddCamera(
 		RF_NoFlags
 	);
 
-	FTransform AdjustedTransform = SpawnTransform;
-	AdjustedTransform.SetLocation(SpawnTransform.GetLocation() + FVector(0.0f, 0.0f, 150.0f));
-	TmpTemplate->SetActorTransform(AdjustedTransform);
+	TmpTemplate->SetActorTransform(SpawnTransform);
 
 	const FGuid CameraGuid = MovieScene->AddSpawnable(TEXT("Camera"), *TmpTemplate);
 

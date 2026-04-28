@@ -28,7 +28,8 @@ public class CinematicTimelineEditor : ModuleRules
 			"MovieSceneTracks",
 			"MovieSceneTools",
 			"Sequencer",
-			"MovieScene"
+			"MovieScene",
+			"Projects"
 		]);
 	}
 }

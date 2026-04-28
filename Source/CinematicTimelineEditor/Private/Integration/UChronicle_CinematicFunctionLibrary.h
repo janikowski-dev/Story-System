@@ -54,6 +54,7 @@ public:
 	    UClass* ParentClass,
 	    const FString& PackagePath,
 	    const FString& BlueprintName,
-		const FChronicle_DialogueInfo& Info
+		const FChronicle_DialogueInfo& Info,
+		const FTransform& ResponseTransform
 	);
 };

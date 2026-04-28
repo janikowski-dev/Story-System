@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "FChronicle_SequenceData.h"
+#include "Setup/UChronicle_ShotPresetData.h"
 #include "UChronicle_CinematicData.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
@@ -25,6 +26,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FGuid> ParticipantIds;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<UChronicle_ShotPresetData> PresetData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FGuid> LineNodeIds;

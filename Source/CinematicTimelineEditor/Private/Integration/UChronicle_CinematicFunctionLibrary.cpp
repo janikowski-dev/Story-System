@@ -73,8 +73,9 @@ UBlueprint* UChronicle_CinematicFunctionLibrary::CreateBlueprintFromParent(
 	UClass* ParentClass,
 	const FString& PackagePath,
 	const FString& BlueprintName,
-	const FChronicle_DialogueInfo& Info
+	const FChronicle_DialogueInfo& Info,
+	const FTransform& ResponseTransform
 )
 {
-	return FChronicle_CinematicBlueprintUtilities::CreateBlueprintFromParent(ParentClass, PackagePath, BlueprintName, Info);
+	return FChronicle_CinematicBlueprintUtilities::CreateBlueprintFromParent(ParentClass, PackagePath, BlueprintName, Info, ResponseTransform);
 }

@@ -1,5 +1,6 @@
 ﻿#include "UChronicle_PlaybackFunctionLibrary.h"
 
+#include "CineCameraActor.h"
 #include "LevelSequencePlayer.h"
 
 void UChronicle_PlaybackFunctionLibrary::OffsetSpawnableTransforms(
@@ -37,6 +38,49 @@ void UChronicle_PlaybackFunctionLibrary::OffsetSpawnableTransforms(
             const FTransform LocalTransform = Actor->GetActorTransform();
             const FTransform WorldTransform = LocalTransform * ParentTransform;
             Actor->SetActorTransform(WorldTransform);
+        }
+    }
+}
+
+void UChronicle_PlaybackFunctionLibrary::OffsetCamera(
+    const ALevelSequenceActor* LevelSequenceActor,
+    const FTransform& OwnerTransform,
+    const FTransform& ResponseTransform,
+    const float VerticalOffset,
+    const float ForwardOffset
+)
+{
+    ULevelSequencePlayer* Player = LevelSequenceActor->GetSequencePlayer();
+    const ULevelSequence* LevelSequence = Cast<ULevelSequence>(LevelSequenceActor->GetSequence());
+    UMovieScene* MovieScene = LevelSequence->GetMovieScene();
+    
+    const FTransform WorldResponseTransform = ResponseTransform * OwnerTransform;
+
+    const FVector Forward = WorldResponseTransform.GetRotation().GetForwardVector();
+    const FVector ParticipantLocation = WorldResponseTransform.GetLocation();
+    const FVector CameraLocation = ParticipantLocation + Forward * ForwardOffset + FVector::UpVector * VerticalOffset;
+    const FVector LookAtTarget = ParticipantLocation + FVector::UpVector * VerticalOffset;
+    const FRotator CameraRotation = (LookAtTarget - CameraLocation).Rotation();
+
+    for (int i = 0; i < MovieScene->GetSpawnableCount(); i++)
+    {
+        const FMovieSceneSpawnable& Spawnable = MovieScene->GetSpawnable(i);
+        if (!Spawnable.GetObjectTemplate()->IsA<ACineCameraActor>()) continue;
+
+        TArray<UObject*> BoundObjects = Player->GetBoundObjects(
+            FMovieSceneObjectBindingID(Spawnable.GetGuid())
+        );
+
+        for (UObject* BoundObject : BoundObjects)
+        {
+            AActor* Actor = Cast<AActor>(BoundObject);
+            
+            if (!Actor)
+            {
+                continue;
+            }
+
+            Actor->SetActorLocationAndRotation(CameraLocation, CameraRotation);
         }
     }
 }
