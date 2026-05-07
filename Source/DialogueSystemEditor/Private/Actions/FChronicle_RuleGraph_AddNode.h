@@ -2,7 +2,7 @@
 
 #include "Data/EChronicle_RuleParameterType.h"
 
-struct FChronicle_RuleGraph_AddNode : FEdGraphSchemaAction
+struct DIALOGUESYSTEMEDITOR_API FChronicle_RuleGraph_AddNode : FEdGraphSchemaAction
 {
 	TSubclassOf<UEdGraphNode> NodeClass;
 	EChronicle_RuleParameterType ParameterType;

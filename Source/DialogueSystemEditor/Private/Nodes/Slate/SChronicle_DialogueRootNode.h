@@ -20,4 +20,6 @@ protected:
 private:
 	void AddCurrentParticipantList(const TSharedRef<SVerticalBox>& Box) const;
 	void AddNewParticipantButton(const TSharedRef<SVerticalBox>& Box) const;
+	TArray<TPair<FName, FGuid>> GetAvailableCharacters() const;
+	TFunction<void(FGuid)> HandleParticipantSelection() const;
 };

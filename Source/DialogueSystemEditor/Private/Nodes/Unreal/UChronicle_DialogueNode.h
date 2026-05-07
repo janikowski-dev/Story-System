@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Data/UChronicle_EmotionAsset.h"
 #include "UChronicle_DialogueNode.generated.h"
 
 class UChronicle_RuleGraph;
@@ -27,11 +26,11 @@ private:
 	
 public:
 	UPROPERTY()
-	TSoftObjectPtr<UChronicle_EmotionAsset> Emotion;
-	UPROPERTY()
 	bool bIsCollapsed = false;
 	UPROPERTY()
 	bool bIsHidden = false;
+	UPROPERTY()
+	FGuid EmotionId;
 	UPROPERTY()
 	FGuid Id;
 };

@@ -2,7 +2,7 @@
 
 enum class EOutputType : int8;
 
-struct FChronicle_RuleGraph_AddOutputNode : FEdGraphSchemaAction
+struct DIALOGUESYSTEMEDITOR_API FChronicle_RuleGraph_AddOutputNode : FEdGraphSchemaAction
 {
 	TSubclassOf<UEdGraphNode> NodeClass;
 	EOutputType OutputType;

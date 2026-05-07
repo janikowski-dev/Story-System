@@ -2,6 +2,7 @@
 
 #include "FChronicle_CharacterDirectory.h"
 #include "SGraphPanel.h"
+#include "FChronicle_EmotionDirectory.h"
 #include "Editors/FChronicle_RuleEditor.h"
 #include "Graphs/UChronicle_DialogueGraph.h"
 #include "Nodes/Unreal/UChronicle_DialogueLineNode.h"
@@ -65,6 +66,18 @@ void SChronicle_DialogueLineNode::AddBody(const TSharedRef<SVerticalBox>& Box)
 		FChronicle_SlateHelper::MakeTextField(
 			TAttribute<FText>(this, &SChronicle_DialogueLineNode::GetText),
 			FOnTextCommitted::CreateSP(this, &SChronicle_DialogueLineNode::SetText)
+		)
+	];
+
+	Box->AddSlot()
+	.AutoHeight()
+	.Padding(4.0f)
+	.HAlign(HAlign_Center)
+	[
+		FChronicle_SlateHelper::MakeEmotionSelectionButton(
+			FOnClicked::CreateSP(this, &SChronicle_DialogueLineNode::OpenEmotionSelectionWindow),
+			FOnClicked::CreateSP(this, &SChronicle_DialogueLineNode::ResetEmotion),
+			FChronicle_EmotionDirectory::GetAll().GetName(TypedNode->EmotionId)
 		)
 	];
 }

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-struct FChronicle_DialogueGraph_FocusRoot : FEdGraphSchemaAction
+struct DIALOGUESYSTEMEDITOR_API FChronicle_DialogueGraph_FocusRoot : FEdGraphSchemaAction
 {
 	FChronicle_DialogueGraph_FocusRoot()
 		: FEdGraphSchemaAction(

@@ -28,8 +28,8 @@ FChronicle_DialogueNodeConnectionDrawingPolicy::FChronicle_DialogueNodeConnectio
 		InDrawElements
 	)
 {
-	LinkBrush = FSlateIcon("FDialogueGraphEditorStyle", "Icons.Link").GetIcon();
-	KeyBrush = FSlateIcon("FDialogueGraphEditorStyle", "Icons.Key").GetIcon();
+	LinkBrush = FSlateIcon("ChronicleEditorStyle", "Icons.Link").GetIcon();
+	KeyBrush = FSlateIcon("ChronicleEditorStyle", "Icons.Key").GetIcon();
 }
 
 void FChronicle_DialogueNodeConnectionDrawingPolicy::DrawSplineWithArrow(

@@ -11,10 +11,6 @@
 
 void FChronicle_DialogueSystemEditorModule::StartupModule()
 {
-	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get().RegisterAdvancedAssetCategory(
-		FName("Chronicle"),
-		FText::FromString("Chronicle")
-	);
 	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get().RegisterAssetTypeActions(
 		MakeShared<FChronicle_DialogueAsset_Actions>()
 	);

@@ -2,7 +2,6 @@
 
 #include "FChronicle_CharacterDirectory.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
-#include "Widgets/Text/SInlineEditableTextBlock.h"
 
 TSharedRef<SWidget> FChronicle_SlateHelper::MakeTextField(
 	const TAttribute<FText>& Getter,
@@ -148,4 +147,148 @@ TSharedRef<SWidget> FChronicle_SlateHelper::MakeCharacterDisplay(
 			.Text(NameGetter)
 		]
 	];
+}
+
+TSharedRef<SWidget> FChronicle_SlateHelper::MakeEmotionSelectionButton(
+	const FOnClicked& OnClickedEmpty,
+	const FOnClicked& OnClickedSet,
+	const FString& Name
+)
+{
+	return SNew(SButton)
+	
+	.OnClicked(Name.IsEmpty() ? OnClickedEmpty : OnClickedSet)
+	.ButtonStyle(FAppStyle::Get(), "HoverHintOnly")
+	.Cursor(EMouseCursor::Type::Hand)
+	[
+		SNew(SHorizontalBox)
+
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.VAlign(VAlign_Center)
+		.Padding(2.0f, 2.0f, 2.0f, 1.5f)
+		[
+			SNew(SImage)
+			.Visibility(Name.IsEmpty() ? EVisibility::Visible : EVisibility::Collapsed)
+			.Image(FAppStyle::Get().GetBrush("Icons.Plus"))
+		]
+
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.VAlign(VAlign_Center)
+		.Padding(5.0f, 2.0f, 2.0f, 1.5f)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString(Name.IsEmpty() ? "Pick Emotion" : Name))
+			.Justification(ETextJustify::Type::Center)
+		]
+
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.VAlign(VAlign_Center)
+		.Padding(2.0f, 2.0f, 2.0f, 1.5f)
+		[
+			SNew(SImage)
+			.Visibility(Name.IsEmpty() ? EVisibility::Collapsed : EVisibility::Visible)
+			.Image(FAppStyle::Get().GetBrush("Icons.X"))
+		]
+	];
+}
+
+FReply FChronicle_SlateHelper::OpenMenuWindow(
+	const FText& HeaderText,
+	const FText& EmptyMessage,
+	const TArray<TPair<FName, FGuid>>& Items,
+	TFunction<void(FGuid)> ItemClickCallback
+)
+{
+	const TSharedRef<SVerticalBox> ItemList = SNew(SVerticalBox);
+
+	for (const TPair<FName, FGuid>& Item : Items)
+	{
+		const FName CapturedName = Item.Key;
+		const FGuid CapturedId = Item.Value;
+
+		ItemList->AddSlot()
+		.AutoHeight()
+		[
+			SNew(SButton)
+			.ButtonStyle(FAppStyle::Get(), "Menu.Button")
+			.ContentPadding(FMargin(16.0f, 6.0f))
+			.HAlign(HAlign_Left)
+			.OnClicked_Lambda([ItemClickCallback, CapturedId]
+			{
+				FSlateApplication::Get().DismissAllMenus();
+				ItemClickCallback(CapturedId);
+				return FReply::Handled();
+			})
+			[
+				SNew(STextBlock)
+				.Text(FText::FromName(CapturedName))
+				.TextStyle(FAppStyle::Get(), "Menu.Label")
+			]
+		];
+	}
+	
+    const TSharedRef<SBorder> Menu =
+    SNew(SBorder)
+    .BorderImage(FAppStyle::GetBrush("Menu.Background"))
+    [
+        SNew(SVerticalBox)
+
+        + SVerticalBox::Slot()
+        .AutoHeight()
+        .Padding(12.0f, 8.0f, 12.0f, 6.0f)
+        [
+            SNew(STextBlock)
+            .Text(HeaderText)
+            .TextStyle(FAppStyle::Get(), "Menu.Heading")
+            .ColorAndOpacity(FSlateColor::UseSubduedForeground())
+        ]
+
+        + SVerticalBox::Slot()
+        .AutoHeight()
+        [
+            SNew(SSeparator)
+            .Thickness(1.0f)
+        ]
+
+        + SVerticalBox::Slot()
+        .AutoHeight()
+        [
+            SNew(SBox)
+            .MinDesiredWidth(120.0f)
+            .MaxDesiredHeight(200.0f)
+            [
+                ItemList->GetChildren()->Num() > 0
+                ? StaticCastSharedRef<SWidget>(
+                    SNew(SScrollBox)
+                    + SScrollBox::Slot()
+                    [
+                        ItemList
+                    ]
+                )
+                : StaticCastSharedRef<SWidget>(
+                    SNew(SBox)
+                    .Padding(12.0f, 8.0f)
+                    [
+                        SNew(STextBlock)
+                        .Text(EmptyMessage)
+                        .TextStyle(FAppStyle::Get(), "SmallText")
+                        .ColorAndOpacity(FSlateColor::UseSubduedForeground())
+                    ]
+                )
+            ]
+        ]
+    ];
+
+    FSlateApplication::Get().PushMenu(
+        FSlateApplication::Get().GetActiveTopLevelWindow().ToSharedRef(),
+        FWidgetPath(),
+        Menu,
+        FSlateApplication::Get().GetCursorPos(),
+        FPopupTransitionEffect::ContextMenu
+    );
+
+    return FReply::Handled();
 }

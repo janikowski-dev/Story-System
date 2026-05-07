@@ -4,20 +4,29 @@
 
 AChronicle_ParticipantPoint::AChronicle_ParticipantPoint()
 {
-	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	PrimaryActorTick.bCanEverTick = false;
-	RootComponent = Root;
-
-	DebugMesh = CreateEditorOnlyDefaultSubobject<UStaticMeshComponent>(TEXT("DebugMesh"));
-    DebugMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	DebugMesh->SetupAttachment(RootComponent);
-	DebugMesh->SetHiddenInGame(true);
+	AddRoot();
+	AddDebugMesh();
 }
 
 void AChronicle_ParticipantPoint::PostInitProperties()
 {
 	Super::PostInitProperties();
 	AssignDebugMesh();
+}
+
+void AChronicle_ParticipantPoint::AddRoot()
+{
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	PrimaryActorTick.bCanEverTick = false;
+	RootComponent = Root;
+}
+
+void AChronicle_ParticipantPoint::AddDebugMesh()
+{
+	DebugMesh = CreateEditorOnlyDefaultSubobject<UStaticMeshComponent>(TEXT("DebugMesh"));
+	DebugMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DebugMesh->SetupAttachment(RootComponent);
+	DebugMesh->SetHiddenInGame(true);
 }
 
 void AChronicle_ParticipantPoint::AssignDebugMesh() const

@@ -4,6 +4,7 @@
 #include "Nodes/Unreal/UChronicle_DialogueRootNode.h"
 #include "Utils/FChronicle_Colors.h"
 #include "Utils/FChronicle_EditorStyle.h"
+#include "Utils/FChronicle_SlateHelper.h"
 
 void SChronicle_DialogueRootNode::Construct(const FArguments&, UChronicle_DialogueRootNode* InNode)
 {
@@ -86,7 +87,7 @@ void SChronicle_DialogueRootNode::AddNewParticipantButton(const TSharedRef<SVert
 	
 	Box->AddSlot()
 	.AutoHeight()
-	.Padding(4.0f)
+	.Padding(4.0f, 6.0f, 4.0f, 4.0f)
 	.HAlign(HAlign_Center)
 	[
 		SNew(SButton)
@@ -96,6 +97,7 @@ void SChronicle_DialogueRootNode::AddNewParticipantButton(const TSharedRef<SVert
 			SNew(SHorizontalBox)
 
 			+ SHorizontalBox::Slot()
+			.Padding(2.0f, 2.0f, 0.0f, 1.5f)
 			.AutoWidth()
 			.VAlign(VAlign_Center)
 			[
@@ -106,7 +108,7 @@ void SChronicle_DialogueRootNode::AddNewParticipantButton(const TSharedRef<SVert
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			.VAlign(VAlign_Center)
-			.Padding(4.0f, 0.0f, 0.0f, 0.0f)
+			.Padding(5.0f, 2.0f, 2.0f, 1.5f)
 			[
 				SNew(STextBlock)
 				.Text(FText::FromString("Add Participant"))
@@ -117,109 +119,58 @@ void SChronicle_DialogueRootNode::AddNewParticipantButton(const TSharedRef<SVert
 
 FReply SChronicle_DialogueRootNode::OpenAddParticipantWindow() const
 {
-	const TSharedRef<SVerticalBox> MissingParticipants = SNew(SVerticalBox);
-	
-	const bool bHasPlayer = TypedGraph->SharedParticipantIds.ContainsByPredicate([](const TSharedPtr<FGuid>& Id)
-	{
-		return FChronicle_CharacterDirectory::GetPlayable().IsValid(*Id);
-	});
-    
-    for (const TSharedPtr<FGuid>& CharacterId : FChronicle_CharacterDirectory::GetAll().GetSharedIds())
-    {
-        if (TypedGraph->HasParticipant(CharacterId))
-        {
-            continue;
-        }
-
-    	const bool bIsPlayer = FChronicle_CharacterDirectory::GetPlayable().IsValid(*CharacterId);
-
-    	if (bHasPlayer && bIsPlayer)
-    	{
-    		continue;
-    	}
-    
-        const FName CharacterName = FChronicle_CharacterDirectory::GetAll().GetName(*CharacterId);
-    
-        MissingParticipants->AddSlot()
-        .AutoHeight()
-        [
-            SNew(SButton)
-            .ButtonStyle(FAppStyle::Get(), "Menu.Button")
-            .ContentPadding(FMargin(16.0f, 6.0f))
-            .HAlign(HAlign_Left)
-            .OnClicked_Lambda([this, CharacterId]
-            {
-                TypedGraph->AddParticipant(CharacterId);
-                FSlateApplication::Get().DismissAllMenus();
-                return FReply::Handled();
-            })
-            [
-            	SNew(STextBlock)
-				.Text(FText::FromName(CharacterName))
-				.TextStyle(FAppStyle::Get(), "Menu.Label")
-            ]
-        ];
-    }
-
-	const TSharedRef<SBorder> Menu =
-	SNew(SBorder)
-	.BorderImage(FAppStyle::GetBrush("Menu.Background"))
-	[
-		SNew(SVerticalBox)
-	
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(12.0f, 8.0f, 12.0f, 6.0f)
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString("Add Participant"))
-			.TextStyle(FAppStyle::Get(), "Menu.Heading")
-			.ColorAndOpacity(FSlateColor::UseSubduedForeground())
-		]
-	
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		[
-			SNew(SSeparator)
-			.Thickness(1.0f)
-		]
-	
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		[
-			SNew(SBox)
-			.MinDesiredWidth(120.0f)
-			.MaxDesiredHeight(200.0f)
-			[
-				MissingParticipants->GetChildren()->Num() > 0
-				? StaticCastSharedRef<SWidget>(
-					SNew(SScrollBox)
-					+ SScrollBox::Slot()
-					[
-						MissingParticipants
-					]
-				)
-				: StaticCastSharedRef<SWidget>(
-					SNew(SBox)
-					.Padding(12.0f, 8.0f)
-					[
-						SNew(STextBlock)
-						.Text(FText::FromString("No characters to add"))
-						.TextStyle(FAppStyle::Get(), "SmallText")
-						.ColorAndOpacity(FSlateColor::UseSubduedForeground())
-					]
-				)
-			]
-		]
-	];
-
-	FSlateApplication::Get().PushMenu(
-		FSlateApplication::Get().GetActiveTopLevelWindow().ToSharedRef(),
-		FWidgetPath(),
-		Menu,
-		FSlateApplication::Get().GetCursorPos(),
-		FPopupTransitionEffect::ContextMenu
+	return FChronicle_SlateHelper::OpenMenuWindow(
+		FText::FromString("Add Participant"),
+		FText::FromString("No characters to add"),
+		GetAvailableCharacters(),
+		HandleParticipantSelection()
 	);
+}
 
-	return FReply::Handled();
+TArray<TPair<FName, FGuid>> SChronicle_DialogueRootNode::GetAvailableCharacters() const
+{
+	TArray<TPair<FName, FGuid>> AvailableCharacters;
+	
+	const bool bHasPlayer = TypedGraph->SharedParticipantIds.ContainsByPredicate(
+		[](const TSharedPtr<FGuid>& Id)
+		{
+			return FChronicle_CharacterDirectory::GetPlayable().IsValid(*Id);
+		});
+
+	for (const TSharedPtr<FGuid>& CharacterId : FChronicle_CharacterDirectory::GetAll().GetSharedIds())
+	{
+		if (TypedGraph->HasParticipant(CharacterId))
+		{
+			continue;
+		}
+
+		const bool bIsPlayer = FChronicle_CharacterDirectory::GetPlayable().IsValid(*CharacterId);
+
+		if (bHasPlayer && bIsPlayer)
+		{
+			continue;
+		}
+
+		const FName CharacterName = FChronicle_CharacterDirectory::GetAll().GetName(*CharacterId);
+		AvailableCharacters.Emplace(CharacterName, *CharacterId);
+	}
+
+	return AvailableCharacters;
+}
+
+TFunction<void(FGuid)> SChronicle_DialogueRootNode::HandleParticipantSelection() const
+{
+	return [this](const FGuid CharacterId)
+	{
+		for (TSharedPtr SharedId : FChronicle_CharacterDirectory::GetAll().GetSharedIds())
+		{
+			if (*SharedId != CharacterId)
+			{
+				continue;
+			}
+
+			TypedGraph->AddParticipant(SharedId);
+			break;
+		}
+	};
 }

@@ -18,7 +18,12 @@
 		{
 			"Name": "ChronicleCore",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "ChronicleCoreEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault"
 		},
         {
             "Name": "DialogueSystemEditor",

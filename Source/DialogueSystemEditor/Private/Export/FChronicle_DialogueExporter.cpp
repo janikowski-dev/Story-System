@@ -115,7 +115,7 @@ void FChronicle_DialogueExporter::ReadNodeData(UChronicle_DialogueData* Data, co
 void FChronicle_DialogueExporter::ReadSharedData(const UChronicle_DialogueNode* Node, FChronicle_DialogueNodeData& NodeData)
 {
     NodeData.Id = Node->Id;
-    NodeData.Emotion = Node->Emotion;
+    NodeData.EmotionId = Node->EmotionId;
     NodeData.Text = Node->GetText().ToString();
 }
 

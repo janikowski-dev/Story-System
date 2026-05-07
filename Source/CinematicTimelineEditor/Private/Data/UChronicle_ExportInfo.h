@@ -10,6 +10,13 @@ UCLASS(Config=CinematicTimelineEditor, DefaultConfig, meta=(DisplayName="Export 
 class CINEMATICTIMELINEEDITOR_API UChronicle_ExportInfo : public UDeveloperSettings
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(Config, EditAnywhere, meta=(DisplayPriority=0))
+	TArray<FChronicle_CinematicEntry> Entries;
+	
+	UPROPERTY(Config, EditAnywhere, meta=(DisplayPriority=1))
+	TArray<FChronicle_DialogueInfo> Infos;
 	
 public:
 	virtual FName GetCategoryName() const override;
@@ -22,11 +29,4 @@ public:
 	FChronicle_CinematicEntry TryAdd(const FChronicle_CinematicEntry& InEntry);
 	void Remove(const FString& Path);
 	bool AreEqual(const UChronicle_CinematicData* A, const UChronicle_CinematicData* B);
-
-public:
-	UPROPERTY(Config, EditAnywhere, meta=(DisplayPriority=0))
-	TArray<FChronicle_CinematicEntry> Entries;
-	
-	UPROPERTY(Config, EditAnywhere, meta=(DisplayPriority=1))
-	TArray<FChronicle_DialogueInfo> Infos;
 };

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-struct FChronicle_DialogueGraph_AddNode : FEdGraphSchemaAction
+struct DIALOGUESYSTEMEDITOR_API FChronicle_DialogueGraph_AddNode : FEdGraphSchemaAction
 {
 	TSubclassOf<UEdGraphNode> NodeClass;
 

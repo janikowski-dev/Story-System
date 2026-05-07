@@ -1,8 +1,8 @@
 ﻿using UnrealBuildTool;
 
-public class CinematicTimeline : ModuleRules
+public class ChronicleCoreEditor : ModuleRules
 {
-	public CinematicTimeline(ReadOnlyTargetRules Target) : base(Target)
+	public ChronicleCoreEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -14,11 +14,8 @@ public class CinematicTimeline : ModuleRules
 		
 		PrivateDependencyModuleNames.AddRange([
 			"ChronicleCore",
-			"CharacterSystem",
-			"LevelSequence",
-			"MovieScene",
-			"MovieSceneTracks",
-			"CinematicCamera"
+			"UnrealEd",
+			"DeveloperSettings"
 		]);
 	}
 }

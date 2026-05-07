@@ -10,21 +10,11 @@ class CINEMATICTIMELINEEDITOR_API UChronicle_CinematicData : public UDataAsset
 {
 	GENERATED_BODY()
 	
-public:
-	UChronicle_CinematicData()
-	{
-		if (Id.IsValid())
-		{
-			return;
-		}
-		
-		Id = FGuid::NewGuid();
-	}
-	
+public:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FGuid, TSoftClassPtr<AChronicle_CharacterActor>> ActorsById;
 	
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<FGuid, TSoftObjectPtr<USoundBase>> SoundsByLine;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -41,4 +31,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FGuid Id;
+	
+public:
+	UChronicle_CinematicData()
+	{
+		if (Id.IsValid())
+		{
+			return;
+		}
+		
+		Id = FGuid::NewGuid();
+	}
 };

@@ -23,6 +23,9 @@ public:
 	FString PresetName;
 
 public:
+	void AddRoot();
+	void AssignId();
+	void AddDebugMesh();
 	AChronicle_ShotSetupActor();
 
 	virtual void PostInitProperties() override;

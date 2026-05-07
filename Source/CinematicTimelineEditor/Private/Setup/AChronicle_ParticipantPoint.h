@@ -22,5 +22,7 @@ public:
 	virtual void PostInitProperties() override;
 
 private:
+	void AddRoot();
+	void AddDebugMesh();
 	void AssignDebugMesh() const;
 };

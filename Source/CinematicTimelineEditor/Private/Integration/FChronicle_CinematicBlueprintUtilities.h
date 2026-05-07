@@ -8,6 +8,7 @@
 struct CINEMATICTIMELINEEDITOR_API FTrackInfo
 {
 	TSoftObjectPtr<USoundBase> Sound;
+	UAnimSequence* Animation;
 	FFrameNumber StartFrame;
 	FFrameNumber EndFrame;
 	FGuid ParticipantId;
@@ -66,6 +67,11 @@ private:
 	);
 	
 	static void PopulateAudioTrack(
+		UMovieScene* MovieScene,
+		const FSequenceInfo& SequenceInfo
+	);
+	
+	static void PopulateAnimationTrack(
 		UMovieScene* MovieScene,
 		const FSequenceInfo& SequenceInfo
 	);

@@ -31,7 +31,7 @@ void SChronicle_RuleInputNode::UpdateGraphNode()
 			.AutoHeight()
 			[
 				SNew(SBox)
-				.Padding(4)
+				.Padding(4.0f)
 				[
 					SNew(STextBlock)
 					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
@@ -89,14 +89,13 @@ TSharedRef<SWidget> SChronicle_RuleInputNode::GetIntegerInputBody() const
 
 	+ SVerticalBox::Slot()
 	.AutoHeight()
-	.Padding(5.0f)
 	[
 		GetRuleSelectionBody()
 	]
     
 	+ SVerticalBox::Slot()
+	.Padding(2.5f, 0.0f, 2.5f, 2.5f)
 	.AutoHeight()
-	.Padding(5.0f)
 	[
 		SNew(SNumericEntryBox<int32>)
 		.Value_Lambda([this]() -> TOptional<int32>
@@ -122,14 +121,13 @@ TSharedRef<SWidget> SChronicle_RuleInputNode::GetCharacterSelectionBody() const
 
 	+ SVerticalBox::Slot()
 	.AutoHeight()
-	.Padding(5.0f)
 	[
 		GetRuleSelectionBody()
 	]
     
 	+ SVerticalBox::Slot()
+	.Padding(2.5f, 0.0f, 2.5f, 2.5f)
 	.AutoHeight()
-	.Padding(5.0f)
 	[
 		SNew(SComboBox<TSharedPtr<FGuid>>)
 		.OptionsSource(&CharacterIds)
@@ -156,25 +154,32 @@ TSharedRef<SWidget> SChronicle_RuleInputNode::GetCharacterSelectionBody() const
 
 TSharedRef<SWidget> SChronicle_RuleInputNode::GetRuleSelectionBody() const
 {
-	return SNew(SComboBox<TSharedPtr<FGuid>>)
-	.OptionsSource(&RuleIds)
-	.OnGenerateWidget_Lambda([this](const TSharedPtr<FGuid>& InItem)
-	{
-		return SNew(STextBlock)
-		.Text(FText::FromName(RuleSet->GetName(*InItem)));
-	})
-	.OnSelectionChanged_Lambda([this](const TSharedPtr<FGuid>& NewSelection, ESelectInfo::Type)
-	{
-		TypedNode->RuleId = *NewSelection;
-	})
+	return SNew(SVerticalBox)
+	
+	+ SVerticalBox::Slot()
+	.Padding(2.5f)
+	.AutoHeight()
 	[
-		SNew(STextBlock)
-		.Text_Lambda([this]() -> FText
+		SNew(SComboBox<TSharedPtr<FGuid>>)
+		.OptionsSource(&RuleIds)
+		.OnGenerateWidget_Lambda([this](const TSharedPtr<FGuid>& InItem)
 		{
-			return RuleSet->IsValid(TypedNode->RuleId) ?
-				FText::FromName(RuleSet->GetName(TypedNode->RuleId)) :
-				FText::FromString("Select rule...");
+			return SNew(STextBlock)
+			.Text(FText::FromName(RuleSet->GetName(*InItem)));
 		})
+		.OnSelectionChanged_Lambda([this](const TSharedPtr<FGuid>& NewSelection, ESelectInfo::Type)
+		{
+			TypedNode->RuleId = *NewSelection;
+		})
+		[
+			SNew(STextBlock)
+			.Text_Lambda([this]() -> FText
+			{
+				return RuleSet->IsValid(TypedNode->RuleId) ?
+					FText::FromName(RuleSet->GetName(TypedNode->RuleId)) :
+					FText::FromString("Select rule...");
+			})
+		]
 	];
 }
 

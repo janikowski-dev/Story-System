@@ -13,6 +13,8 @@
 #include "Tracks/MovieSceneSpawnTrack.h"
 #include "UObject/SavePackage.h"
 #include "LevelSequence.h"
+#include "Sequences/UChronicle_AnimationSection.h"
+#include "Sequences/UChronicle_AnimationTrack.h"
 
 FChronicle_SequenceInfo FChronicle_CinematicBlueprintUtilities::InitSequence(
 	ULevelSequence* LevelSequence,
@@ -173,7 +175,7 @@ bool FChronicle_CinematicBlueprintUtilities::TryGetMovieScene(const ULevelSequen
 	{
 		return false;
 	}
-	
+
 	MovieScene->SetClockSource(EUpdateClockSource::Audio);
 	return true;
 }
@@ -311,6 +313,7 @@ FSequenceInfo FChronicle_CinematicBlueprintUtilities::ConvertToInfo(
 		TrackInfo.StartFrame = FrameCounter;
 		TrackInfo.EndFrame = FrameDuration + FrameCounter;
 		TrackInfo.ParticipantId = Node.SpeakerId;
+		TrackInfo.EmotionId = Node.EmotionId;
 		TrackInfo.Id = Node.Id;
 
 		SequenceInfo.Tracks.Add(TrackInfo);
@@ -382,7 +385,7 @@ void FChronicle_CinematicBlueprintUtilities::PopulateAudioTrack(
 )
 {
 	UMovieSceneTrack* AudioTrack = MovieScene->AddTrack<UMovieSceneAudioTrack>();
-
+	
 	if (UMovieSceneNameableTrack* Nameable = Cast<UMovieSceneNameableTrack>(AudioTrack))
 	{
 		Nameable->SetDisplayName(FText::FromString("Main Track"));
@@ -400,6 +403,29 @@ void FChronicle_CinematicBlueprintUtilities::PopulateAudioTrack(
 		AudioSection->SetIsLocked(true);
 		AudioSection->SetSound(Sound);
 	}
+}
+
+void FChronicle_CinematicBlueprintUtilities::PopulateAnimationTrack(
+	UMovieScene* MovieScene,
+	const FSequenceInfo& SequenceInfo
+)
+{
+	UChronicle_AnimationTrack* Track = MovieScene->AddTrack<UChronicle_AnimationTrack>();
+	
+	
+	if (UMovieSceneNameableTrack* Nameable = Cast<UMovieSceneNameableTrack>(AudioTrack))
+	{
+		Nameable->SetDisplayName(FText::FromString("Main Track"));
+	}
+	UChronicle_AnimationSection* Section = Cast<UChronicle_AnimationSection>(Track->CreateNewSection());
+
+	Section->SetRange(MovieScene->GetPlaybackRange());
+	Track->AddSection(*Section);
+
+	UAnimSequence* AnimSequence = nullptr;
+	FMovieSceneObjectPathChannelKeyValue Value(AnimSequence);
+
+	Section->AnimationChannel.GetData().AddKey(TriggerFrame, Value);
 }
 
 FGuid FChronicle_CinematicBlueprintUtilities::AddCamera(

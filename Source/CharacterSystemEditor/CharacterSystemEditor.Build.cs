@@ -14,11 +14,16 @@ public class CharacterSystemEditor : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange([
 			"ChronicleCore",
+			"ChronicleCoreEditor",
+			"PropertyEditor",
 			"CharacterSystem",
 			"AssetRegistry",
 			"AssetTools",
 			"UnrealEd",
-			"DeveloperSettings"
+			"Slate",
+			"SlateCore",
+			"DeveloperSettings",
+			"InputCore"
 		]);
 	}
 }

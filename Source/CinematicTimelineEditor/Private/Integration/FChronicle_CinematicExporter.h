@@ -3,7 +3,7 @@
 #include "Data/UChronicle_CinematicData.h"
 #include "Data/UChronicle_DialogueData.h"
 
-class FChronicle_CinematicExporter
+class CINEMATICTIMELINEEDITOR_API FChronicle_CinematicExporter
 {
 public:
 	static UChronicle_CinematicData* ExportToCinematicData(const UChronicle_DialogueData* Input, const FString Path);

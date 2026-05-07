@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "SChronicle_DialogueNode.h"
+#include "SChronicle_DialogueEmotionNode.h"
 
 class UChronicle_DialogueLineNode;
 
-class SChronicle_DialogueLineNode : public SChronicle_DialogueNode<UChronicle_DialogueLineNode>
+class SChronicle_DialogueLineNode : public SChronicle_DialogueEmotionNode<UChronicle_DialogueLineNode>
 {
 public:
 	SLATE_BEGIN_ARGS(SChronicle_DialogueLineNode) {}

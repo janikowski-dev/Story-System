@@ -9,19 +9,9 @@
 
 AChronicle_ShotSetupActor::AChronicle_ShotSetupActor()
 {
-    USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-    PrimaryActorTick.bCanEverTick = false;
-    RootComponent = Root;
-
-    if (!Id.IsValid())
-    {
-        Id = FGuid::NewGuid();
-    }
-
-    DebugMesh = CreateEditorOnlyDefaultSubobject<UStaticMeshComponent>(TEXT("DebugMesh"));
-    DebugMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    DebugMesh->SetupAttachment(RootComponent);
-    DebugMesh->SetHiddenInGame(true);
+    AddRoot();
+    AssignId();
+    AddDebugMesh();
 }
 
 void AChronicle_ShotSetupActor::PostInitProperties()
@@ -111,6 +101,29 @@ void AChronicle_ShotSetupActor::CollectAttachedPoints(
             OutParticipants.Add(Participant);
         }
     }
+}
+
+void AChronicle_ShotSetupActor::AddRoot()
+{
+    USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+    PrimaryActorTick.bCanEverTick = false;
+    RootComponent = Root;
+}
+
+void AChronicle_ShotSetupActor::AssignId()
+{
+    if (!Id.IsValid())
+    {
+        Id = FGuid::NewGuid();
+    }
+}
+
+void AChronicle_ShotSetupActor::AddDebugMesh()
+{
+    DebugMesh = CreateEditorOnlyDefaultSubobject<UStaticMeshComponent>(TEXT("DebugMesh"));
+    DebugMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    DebugMesh->SetupAttachment(RootComponent);
+    DebugMesh->SetHiddenInGame(true);
 }
 
 void AChronicle_ShotSetupActor::AssignDebugMesh() const

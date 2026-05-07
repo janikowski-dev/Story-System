@@ -2,7 +2,7 @@
 
 #include "AssetTypeActions_Base.h"
 
-class FChronicle_DialogueAsset_Actions : public FAssetTypeActions_Base
+class DIALOGUESYSTEMEDITOR_API FChronicle_DialogueAsset_Actions : public FAssetTypeActions_Base
 {
 public:
 	virtual void OpenAssetEditor(

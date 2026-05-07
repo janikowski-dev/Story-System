@@ -5,9 +5,9 @@
 
 UChronicle_DialogueAssetFactory::UChronicle_DialogueAssetFactory()
 {
-	bCreateNew = true;
-	bEditAfterNew = true;
 	SupportedClass = UChronicle_DialogueAsset::StaticClass();
+	bEditAfterNew = true;
+	bCreateNew = true;
 }
 
 UObject* UChronicle_DialogueAssetFactory::FactoryCreateNew(

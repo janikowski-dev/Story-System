@@ -28,5 +28,18 @@ public:
 		const FSlateBrush* Icon,
 		const TAttribute<FText>& NameGetter
 	);
+
+	static TSharedRef<SWidget> MakeEmotionSelectionButton(
+		const FOnClicked& OnClickedEmpty,
+		const FOnClicked& OnClickedSet,
+		const FString& Name
+	);
+	
+	static FReply OpenMenuWindow(
+		const FText& HeaderText,
+		const FText& EmptyMessage,
+		const TArray<TPair<FName, FGuid>>& Items,
+		TFunction<void(FGuid)> ItemClickCallback
+	);
 };
 

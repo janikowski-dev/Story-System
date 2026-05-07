@@ -14,6 +14,7 @@ public class DialogueSystemEditor : ModuleRules
 		
 		PrivateDependencyModuleNames.AddRange([
 			"ChronicleCore",
+			"ChronicleCoreEditor",
 			"RuleSystemEditor",
 			"CharacterSystemEditor",
 			"Core",

@@ -4,6 +4,7 @@
 #include "Assets/UChronicle_DialogueAsset.h"
 #include "Graphs/UChronicle_DialogueGraph.h"
 #include "GraphEditor.h"
+#include "FChronicle_EmotionDirectory.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Framework/Docking/TabManager.h"
 
@@ -36,6 +37,7 @@ void FChronicle_DialogueEditor::InitDialogueAssetEditor(
 )
 {
 	FChronicle_CharacterDirectory::Refresh();
+	FChronicle_EmotionDirectory::Refresh();
 	
 	const TSharedRef<FTabManager::FLayout> Layout =
 		FTabManager::NewLayout("DialogueAssetEditor")

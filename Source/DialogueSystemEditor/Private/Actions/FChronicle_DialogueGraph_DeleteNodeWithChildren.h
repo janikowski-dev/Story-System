@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-struct FChronicle_DialogueGraph_DeleteNodeWithChildren : FEdGraphSchemaAction
+struct DIALOGUESYSTEMEDITOR_API FChronicle_DialogueGraph_DeleteNodeWithChildren : FEdGraphSchemaAction
 {
 	virtual UEdGraphNode* PerformAction(
 		UEdGraph* ParentGraph,
